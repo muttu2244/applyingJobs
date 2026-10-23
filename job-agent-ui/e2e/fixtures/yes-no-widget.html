@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Application — screening questions</title>
+  <style>
+    body { font: 15px/1.5 system-ui, sans-serif; max-width: 640px; margin: 40px auto; }
+    .q { margin: 24px 0 10px; font-weight: 600; }
+    .pill { display: block; border: 1px solid #cfd4dc; border-radius: 999px; padding: 14px 18px; margin-bottom: 10px; }
+    .pill input { width: 18px; height: 18px; margin-right: 12px; vertical-align: middle; }
+    button { margin-top: 24px; padding: 12px 22px; border-radius: 10px; border: 0; background: #2b5cff; color: #fff; font-size: 15px; }
+    .full { width: 100%; display: block; text-align: center; }
+    #step2 { display: none; }
+  </style>
+</head>
+<body>
+  <!-- Step 1 — exactly the reported widgets: the question is a plain <p>,
+       wired to nothing; the options say only "yes" / "no", and the
+       questionnaire offers nothing but "Save". -->
+  <form id="app">
+    <div id="step1">
+      <p class="q">Do you have form 16 and P/F A/c of current &amp; previous company</p>
+      <div class="opts">
+        <label class="pill"><input type="radio" name="form16" value="yes"><span>yes</span></label>
+        <label class="pill"><input type="radio" name="form16" value="no"><span>no</span></label>
+      </div>
+
+      <!-- Same shape, but the radios have NO name at all (custom React widgets). -->
+      <p class="q">Do you hold a valid passport</p>
+      <div class="opts">
+        <label class="pill"><input type="radio" value="yes"><span>yes</span></label>
+        <label class="pill"><input type="radio" value="no"><span>no</span></label>
+      </div>
+
+      <!-- An option-list question whose only control is Save. -->
+      <p class="q">What is your notice period?</p>
+      <div class="opts">
+        <label class="pill"><input type="radio" name="notice" value="15 Days or less"><span>15 Days or less</span></label>
+        <label class="pill"><input type="radio" name="notice" value="1 Month"><span>1 Month</span></label>
+        <label class="pill"><input type="radio" name="notice" value="2 Months"><span>2 Months</span></label>
+        <label class="pill"><input type="radio" name="notice" value="3 Months"><span>3 Months</span></label>
+        <label class="pill"><input type="radio" name="notice" value="More than 3 Months"><span>More than 3 Months</span></label>
+        <label class="pill"><input type="radio" name="notice" value="Serving Notice Period"><span>Serving Notice Period</span></label>
+        <label class="pill"><input type="radio" name="notice" value="Skip this question"><span>Skip this question</span></label>
+      </div>
+
+      <button type="button" class="full" id="save">Save</button>
+    </div>
+
+    <div id="step2">
+      <p class="q">Review and submit</p>
+      <button type="button" id="submit">Submit Application</button>
+    </div>
+  </form>
+  <script>
+    document.getElementById("save").addEventListener("click", () => {
+      document.getElementById("step1").style.display = "none";
+      document.getElementById("step2").style.display = "block";
+    });
+    document.getElementById("submit").addEventListener("click", () => {
+      const done = document.createElement("h2");
+      done.textContent = "Thank you for your application";
+      document.body.appendChild(done);
+    });
+  </script>
+</body>
+</html>

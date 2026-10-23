@@ -1,0 +1,6 @@
+2026/10/16-13:14:01.697 3df4 Creating DB C:\Projects\ApplyingJobsFrom_LinkedInScraping_Project\job-agent-ui\e2e\.profile\Default\IndexedDB\https_www.ambitionbox.com_0.indexeddb.leveldb since it was missing.
+2026/10/16-13:14:01.797 3df4 Reusing MANIFEST C:\Projects\ApplyingJobsFrom_LinkedInScraping_Project\job-agent-ui\e2e\.profile\Default\IndexedDB\https_www.ambitionbox.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/10/16-13:14:03.509 67d4 Level-0 table #5: started
+2026/10/16-13:14:03.625 67d4 Level-0 table #5: 1817 bytes OK
+2026/10/16-13:14:03.674 67d4 Delete type=0 #3
+2026/10/16-13:14:03.695 2e58 Manual compaction at level-0 from '\x00\x03\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x04\x00\x00\x00' @ 0 : 0; will stop at (end)

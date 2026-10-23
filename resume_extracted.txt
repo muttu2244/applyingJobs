@@ -1,0 +1,204 @@
+SHIVAYOGI MATH 
+AI/ML | MLOps | FullStack  
+■ muttu2244@gmail.com ■ +91-9900455663 ■ Bangalore 
+■ LinkedIn Profile ■ GitHub Portfolio 
+ 
+PROFESSIONAL SUMMARY 
+20+ years of technical expertise spanning development, cloud infrastructure, and AI/ML 
+engineering. Specialized in building end-to-end automated solutions that bridge development, 
+operations, and machine learning. Proven track record of implementing MLOps pipelines, 
+deploying containerized applications on Kubernetes, and automating complex workflows across 
+AWS, GCP, and Azure. Strong Python developer with hands-on experience in CI/CD,  
+frameworks, and production ML deployments. Recently completed intensive AI/ML upskilling 
+with practical projects in NLP, computer vision, and generative AI. 
+CORE COMPETENCIES 
+Development: Python development frameworks, API, Java, FastAPI, Flask, Django, REST APIs, 
+SQL, vector databases, data pipelines 
+MLOps & Deployment: MLflow, DVC, ZenML, Kubernetes, Docker, CI/CD for ML, model 
+monitoring, AWS SageMaker, EKS, CUDA 
+AI/ML Engineering: TensorFlow, PyTorch, scikit-learn, LangChain, RAG systems, NLP (BERT, 
+GPT), computer vision, AutoML, Agentic AI 
+Cloud & DevOps: AWS (EC2, S3, EKS, Lambda), GCP, Azure, Terraform, GitHub Actions, 
+containerization, microservices, Azure AI Foundry,  
+Domain Knowledge: IT development, security compliance, network monitoring, storage 
+management, healthcare tech, disaster recovery 
+PROFESSIONAL EXPERIENCE 
+AI Architect | Streamline Healthcare | March 2026 | Bangalore 
+Smartcare Assistant Platform  
+Summary: Designed and productionized an AI-enabled  platform that transforms ADO 
+ticket and test data into ranked, actionable risk intelligence for engineering leadership. 
+• 
+Architected and shipped a production AI/ platform (Python, FastAPI, Azure, Azure 
+DevOps) from monolith to a layered routes/services/repositories architecture, executing 
+the migration with zero runtime disruption. 
+• 
+Built a predictive defect-risk pipeline (XGBoost-based inference) supporting Quick and 
+End-to-End scoring modes, recurrence-candidate detection, and thresholded risk 
+classification across tickets and module groups. 
+• 
+Engineered an ADO-integrated E2E workflow — MSP workbook ingestion → 
+feature/module mapping → combined risk mapping → predictive scoring → ADO export 
+— closing the loop from raw planning data to prioritized  action. 
+• 
+Delivered a RAG-style chat assistant with grounded, context-aware Q&A over uploaded 
+documents and persistent session context. 
+• 
+Designed a framework-agnostic agentic orchestration layer, blending deterministic 
+retrieval/rules with LLM reasoning — built without dependency on LangChain/AutoGen 
+scaffolding. 
+
+• 
+Built leadership-facing UX: AI-driven risk filtering, real-time KPI recalculation, paginated 
+views, and CSV export for executive reporting. 
+• 
+Hardened operational reliability with startup/runtime validation and automated recovery 
+for environment/config dependencies. 
+• 
+Presented recurring end-to-end demos to leadership, translating technical architecture 
+into executive-level impact narratives. 
+• 
+Bug-to-test traceability engine mapping predicted defects to ADO test plans/cases with 
+automated gap detection; missing-test generation via dual Keyword (deterministic) and 
+Free Text (AI-assisted) modes. 
+Impact 
+• 
+Cut  analysis time by converting raw ticket/module signals into ranked, exportable risk 
+candidate lists. 
+• 
+Improved leadership review velocity via filter-aware KPIs and paginated risk dashboards. 
+• 
+Increased platform maintainability by refactoring monolithic handlers into a modular, 
+layered API architecture. 
+Tech Stack: Python, FastAPI, Pydantic, asyncio, Azure DevOps API, Azure AI/LLM 
+integration, XGBoost, Excel/CSV data pipelines, Git branching workflows 
+Legacy Modernization & HIPAA-Compliant Platform (Multi-Agent AI System) 
+Summary: Engineered a 6-agent autonomous modernization pipeline and a HIPAA-
+compliant  assistant on Azure AI Foundry — applying agent harness design, context 
+and graph engineering, and RAG to cut legacy conversion time by 95%+ while enforcing 
+zero-PHI-exposure to external LLMs. 
+• 
+Designed a 6-agent orchestration graph (LangGraph/AutoGen) with explicit state 
+transitions, retry/fallback loops, and role-scoped tool access — converting .NET 4.8 → 
+.NET Core 8 + Angular modules in <3 days vs. 8–12 weeks manually, across 275 
+modules. 
+• 
+Built per-agent context pipelines (requirements extraction, reverse-engineered 
+schema/business logic, migration constraints) to keep each agent's working context 
+minimal, relevant, and token-efficient across long-running tasks. 
+• 
+Implemented deterministic control loops governing agent handoffs (requirements → 
+reverse engineering → DB migration planning → codegen → test generation → Test 
+case generation), with checkpointing to resume failed stages without full re-runs. 
+• 
+Integrated Azure AI Search-based retrieval to ground code generation and test creation 
+in actual legacy codebase context, reducing hallucinated logic in generated .NET 
+Core/Angular code. 
+• 
+Built automated eval harnesses scoring generated code (compile success, test-pass 
+rate, xUnit/Jest coverage) and Test test cases (ADO-format compliance, 80–100 
+cases/module) before human review. 
+• 
+Instrumented full pipeline tracing via Application Insights — per-agent latency, token 
+usage, failure points, and HIPAA-compliant audit logging across every LLM call. 
+• 
+Built a zero-trust PHI sanitization gate (Microsoft Presidio + SHA-256 deterministic 
+masking) — pre-call and post-call sanitization on every LLM interaction — achieving 
+zero PHI exposure to GPT-4o/Claude Opus 4.6. 
+• 
+Deployed on Azure AI Foundry with shared infrastructure — APIM, Entra ID RBAC, Key 
+Vault, Redis Cache — containerized (Docker) on Azure Container Apps via Azure 
+DevOps CI/CD with zero-downtime rolling deploys. 
+• 
+Architected 3  features to run AI-independent from Day 1, with 4 AI-driven features 
+engineered for zero-rework activation on Foundry access approval. 
+
+Impact 
+• 
+95%+ reduction in legacy modernization time (8–12 weeks → <3 days/module) across 
+275 modules. 
+• 
+Zero PHI exposure to external models via dual-layer sanitization, verified through 
+automated evals. 
+• 
+Full pipeline observability enabling failure isolation to individual agent stages rather than 
+whole-run debugging. 
+Tech Stack: LangGraph, AutoGen, Azure AI Foundry, GPT-4o, Claude Opus 4.6, Azure AI 
+Search (RAG), Microsoft Presidio, Application Insights, Azure APIM, Entra ID, Key Vault, Redis, 
+.NET Core 8, Angular, EF Core, xUnit, Jest, Docker, Azure Container Apps, Azure DevOps 
+CI/CD 
+Senior Lead – AI/ML  
+Kyndryl | Oct 2020 –  Dec 2025 | Bangalore 
+• Architected and deployed multi-agent AI compliance system monitoring 50+ AWS accounts, 
+reducing false positives from 34% to 2% and remediation time from 8.3 days to 2.1 hours, 
+saving $1.2M annually 
+• Built end-to-end MLOps pipelines using Terraform, ZenML, and Kubernetes for automated 
+model training and deployment across Dev/QA/Prod environments 
+• Developed BERT-based IT ticket classification achieving more than 90% accuracy with 
+FastAPI deployment and Prometheus/Grafana monitoring 
+• Implemented cloud-native CI/CD using GitHub Actions for containerized applications on AWS 
+EKS with auto-scaling and Route 53 DNS development 
+• Designed NLP-driven service desk development reducing ticket resolution time by 40% 
+using Fasttext, Kubernetes, and AWS infrastructure. 
+• Processed 15M+ compliance signals daily using Kafka, PostgreSQL, and LLMs with 
+complete audit trail implementation 
+• Automation development for end-to-end deployment of Resiliency Orchestration, an 
+enterprise disaster recovery and business continuity platform managing failover operations 
+across distributed multi-site infrastructure 
+Staff Engineer – development & Security 
+McAfee | Oct 2017 – Mar 2020 | Bangalore 
+• Built Enterprise Connector and Data Loss Prevention solutions with integrated AI/ML pipelines 
+for anomaly detection 
+• Automated ML workflows using  MLflow, and DVC with Kubernetes-based 
+deployments 
+• Designed scalable data ingestion pipelines on AWS and GCP for real-time security event 
+processing 
+• Implemented automated  frameworks for security product validation across multiple cloud 
+platforms 
+• Developed tokenization/detokenization features for PII protection with Active Directory and 
+SIEM integration 
+• Deployed Docker/Kubernetes-based microservices architecture for enterprise cloud security 
+solutions 
+ 
+
+Architect – Healthcare & development 
+Wipro | Sep 2014 – Sep 2017 | Bangalore 
+• Architected BioPDigitalPlatform for Merck including Recipe Editor, Recipe Loader, and Recipe 
+Executor components 
+• Built EMR connectivity solutions adhering to HL7 v2.5.1 standards with HL7 message 
+formatting (ORM, ORU, ADT, SIU) 
+• Implemented CNN models (YOLO, DeepLab) for medical image classification and analysis 
+• Automated deployment pipelines using GitHub Actions and Docker for healthcare applications 
+• Developed HIPAA-compliant development frameworks for healthcare systems with XML-to-
+HL7 conversion 
+• Created REST-based microservices using Python Flask/Django for healthcare data 
+management 
+Senior Engineer - platform 
+Zynga | Apr 2011 – Aug 2014 | Bangalore 
+• Developed Zynga Mobile development Platform with scalable plugin architecture 
+supporting multiple external services 
+• Built comprehensive development frameworks for SSX circuit-based device managing 
+large- scale subscriber sessions 
+• Implemented performance  and monitoring solutions for mobile gaming infrastructure 
+• Developed REST web service microservices with Ansible scripts for deployment development 
+• Created integration platform for third-party services with DAPI layer plugins (Player ID, Game 
+Storage, Graphs) 
+Senior Engineer – Development & Tools 
+HP (2007-2011) & Mindtree (2004-2007) 
+• HP: Developed MetricsSPI reporting tool for network performance analytics with NNM 
+integration for data analysis, aggregation, and trend visualization 
+• HP: Designed and tested firmware for HP Calculators including financial and probability 
+calculation features 
+• HP: Built development frameworks for SSX IP circuit-based device with features 
+including VLAN, OSPF, SNMP, BGP 
+• Mindtree: Built Storage Management Engine (SME) for Symantec enabling incremental 
+backups and disaster recovery across Windows/Linux file systems 
+• Mindtree: Developed MAX network management tool for heterogeneous IT infrastructure 
+monitoring with SNMP data collection, alarm management, and syslog integration 
+• Mindtree: Implemented comprehensive monitoring for memory, network, CPU utilization, and 
+website response time with notification and escalation workflows 
+EDUCATION & CERTIFICATIONS 
+• AI/ML Ops Certification – Indian Institute of Science, Bangalore (2024) 
+• MCA (Computer Applications) – VTU/BMSCE, Bangalore (2003) 
+• PGDBA – Symbiosis Institute Pune(2012) 
+• Scaled Agile Framework Certified 
+ 

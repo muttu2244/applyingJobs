@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  *{box-sizing:border-box}
+  body{font:13px/1.45 system-ui,sans-serif;margin:0;width:380px;background:#0f1115;color:#e6e9ef}
+  header{padding:12px 14px 8px}
+  h1{font-size:13px;margin:0;color:#7ee787;display:flex;align-items:center;gap:6px}
+  h1 span.tag{font-size:10px;color:#8b949e;font-weight:400}
+  #status{color:#8b949e;font-size:11px;margin:3px 0 0}
+  #status b{color:#c9d1d9;font-weight:600}
+  #status.notrun{color:#d29922}
+
+  .boards{display:flex;flex-wrap:wrap;gap:5px;padding:0 14px 10px}
+  .bwrap{display:flex;align-items:center;gap:2px}
+  .chip{border:1px solid #30363d;background:#161b22;color:#8b949e;border-radius:999px;
+        padding:3px 9px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:5px}
+  .chip:hover{background:#21262d}
+  .chip .dot{width:6px;height:6px;border-radius:50%;background:#484f58;flex:none}
+  .chip.on{color:#e6e9ef;border-color:#2ea04366;background:#12261a}
+  .chip.on .dot{background:#3fb950}
+  .chip.wait{color:#e6e9ef;border-color:#d2992266;background:#241d0d}
+  .chip.wait .dot{background:#d29922}
+  .chip.bad{color:#e6e9ef;border-color:#f8514966;background:#2a1315}
+  .chip.bad .dot{background:#f85149}
+  .skip{padding:2px 5px;font-size:10px;border:0;background:none;color:#8b949e;cursor:pointer;text-decoration:underline}
+  .skip:hover{color:#c9d1d9}
+  .x{padding:0 3px;border:0;background:none;color:#6e7681;cursor:pointer;font-size:13px;line-height:1}
+  .x:hover{color:#f85149}
+
+  .cta{display:flex;gap:6px;padding:0 14px 8px}
+  .cta:empty{display:none}
+  .cta button{flex:1;padding:7px 8px;border-radius:7px;border:1px solid #30363d;background:#21262d;
+              color:#c9d1d9;font-size:11.5px;font-weight:600;cursor:pointer}
+  .cta button:hover{background:#30363d}
+  .cta button.go{background:#238636;border-color:#2ea043;color:#fff}
+  .cta button.go:hover{background:#2ea043}
+  .cta button[disabled]{opacity:.45;cursor:not-allowed}
+  .runline{padding:0 14px;font-size:11px;color:#8b949e}
+  .runline:empty{display:none}
+  .runline b{color:#e6e9ef}
+  .runline button{margin-left:6px;padding:1px 7px;border-radius:5px;border:1px solid #f8514966;
+                  background:#2a1315;color:#fca5a5;font-size:10.5px;cursor:pointer}
+
+  .jobs{padding:0 10px 8px;max-height:300px;overflow:auto;display:flex;flex-direction:column;gap:7px}
+  .jobs::-webkit-scrollbar{width:8px}
+  .jobs::-webkit-scrollbar-thumb{background:#30363d;border-radius:4px}
+  .job{background:#161b22;border:1px solid #30363d;border-radius:9px;padding:9px 10px;cursor:pointer}
+  .job:hover{border-color:#3d444d;background:#1a2029}
+  .job .top{display:flex;align-items:center;gap:6px;margin-bottom:2px}
+  .board{font-size:10px;font-weight:600;color:#79c0ff;background:#0d2438;border:1px solid #1f4b6b;
+         border-radius:4px;padding:0 5px;text-transform:capitalize}
+  .fresh{font-size:10px;color:#7ee787}
+  .match{margin-left:auto;font-size:11px;font-weight:700;color:#7ee787}
+  .job h3{font-size:12.5px;margin:0 0 1px;font-weight:600;line-height:1.3;
+          display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .co{margin:0;color:#8b949e;font-size:11.5px}
+  .meta{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .fact{font-size:10.5px;color:#c9d1d9;background:#21262d;border-radius:4px;padding:1px 6px}
+  .fact.exp{color:#e3b341;background:#241d0d}
+  .fact.loc{color:#a5d6ff;background:#0d2438}
+  .foot{display:flex;align-items:center;gap:6px;margin-top:7px}
+  .listed{font-size:10.5px;color:#6e7681}
+  .acts{margin-left:auto;display:flex;gap:5px}
+  .mini{font-size:10.5px;padding:2px 8px;border-radius:5px;border:1px solid #30363d;
+        background:#21262d;color:#c9d1d9;cursor:pointer}
+  .mini:hover{background:#30363d}
+  .mini.ok{border-color:#2ea04366;background:#12261a;color:#7ee787}
+  .empty{color:#8b949e;font-size:11.5px;padding:10px 4px 14px;line-height:1.5}
+  .empty b{color:#c9d1d9}
+
+  footer{border-top:1px solid #21262d;padding:9px 14px 12px}
+  .actions{display:flex;gap:6px}
+  .actions button{flex:1;padding:8px;border:0;border-radius:7px;background:#238636;color:#fff;
+                  font-size:12.5px;font-weight:600;cursor:pointer}
+  .actions button:hover{background:#2ea043}
+  .actions button.secondary{background:#21262d;color:#c9d1d9;border:1px solid #30363d}
+  .actions button.secondary:hover{background:#30363d}
+  .actions button[disabled]{background:#21262d;color:#484f58;cursor:not-allowed}
+  .toggle{display:flex;align-items:center;gap:7px;margin-top:8px;font-size:11.5px;color:#c9d1d9}
+  .toggle input{accent-color:#238636}
+  #out{margin-top:7px;font-size:11.5px;color:#c9d1d9;white-space:pre-wrap}
+  #out:empty{display:none}
+  .ok{color:#7ee787}.warn{color:#d29922}.stop{color:#f85149}
+  .k{color:#8b949e}
+</style>
+</head>
+<body>
+  <header>
+    <h1>My Job Agent <span class="tag" id="ver"></span></h1>
+    <div id="status">Connecting to the dashboard…</div>
+  </header>
+
+  <!-- Boards live here now: a chip per board. Click = connect and verify the
+       session in your browser; the chip turns green only on real evidence. -->
+  <div class="boards" id="boards"></div>
+
+  <!-- Fetch-all + apply run: the two actions that make this an agent. -->
+  <div class="cta" id="cta"></div>
+  <div class="runline" id="runline"></div>
+
+  <!-- One card per job: which board it came from, experience, location, pay. -->
+  <div class="jobs" id="jobs"></div>
+
+  <footer>
+    <div class="actions">
+      <button id="go">Fill &amp; submit</button>
+      <button id="fillonly" class="secondary">Fill only</button>
+    </div>
+    <label class="toggle">
+      <input type="checkbox" id="autopilot" checked>
+      <span>Autopilot for approved jobs</span>
+    </label>
+    <div id="out"></div>
+  </footer>
+  <script src="popup.js"></script>
+</body>
+</html>

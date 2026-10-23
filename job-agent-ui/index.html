@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>My Job Agent</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ Step rail ============ -->
+  <aside class="rail">
+    <div class="brand">
+      <div class="logo">◆</div>
+      <div>
+        <div class="brand-name">My Job Agent</div>
+        <div class="brand-sub">auto-match · approve · auto-apply</div>
+      </div>
+    </div>
+
+    <nav class="steps" id="steps">
+      <button class="step active" data-step="profile">
+        <span class="dot">1</span>
+        <span class="step-label">Your profile<br><small>who you are, what you want</small></span>
+      </button>
+      <button class="step" data-step="boards">
+        <span class="dot">2</span>
+        <span class="step-label">Job boards<br><small>connect sources</small></span>
+      </button>
+      <button class="step" data-step="match">
+        <span class="dot">3</span>
+        <span class="step-label">Match %<br><small>resume vs jobs</small></span>
+      </button>
+      <button class="step" data-step="approve">
+        <span class="dot">4</span>
+        <span class="step-label">Approve<br><small>you green-light each</small></span>
+      </button>
+      <button class="step" data-step="apply">
+        <span class="dot">5</span>
+        <span class="step-label">Apply &amp; digest<br><small>agent submits</small></span>
+      </button>
+    </nav>
+
+    <div class="rail-foot">
+      <div class="stat"><b id="stat-connected">0</b><span>boards connected</span></div>
+      <div class="stat"><b id="stat-approved">0</b><span>approved</span></div>
+      <div class="stat"><b id="stat-applied">0</b><span>applied / queued</span></div>
+    </div>
+  </aside>
+
+  <!-- ============ Main ============ -->
+  <main class="main">
+
+    <!-- Step 1: profile -->
+    <section class="panel active" id="panel-profile">
+      <header class="panel-head">
+        <h1>Where do you want to land?</h1>
+        <p class="sub">Your details are loaded from the resume already on disk. Edit anything that's stale.</p>
+      </header>
+
+      <div class="card-grid">
+        <div class="card form-card">
+          <div class="card-title">Candidate</div>
+          <div class="form">
+            <label>Full name<input id="f-name" type="text" /></label>
+            <label>Email<input id="f-email" type="text" /></label>
+            <label>Phone<input id="f-phone" type="text" /></label>
+            <label>Location<input id="f-location" type="text" /></label>
+            <label>Notice period<input id="f-notice" type="text" value="Immediate – 30 days" /></label>
+          </div>
+        </div>
+
+        <div class="card form-card">
+          <div class="card-title">Target roles</div>
+          <div class="chips" id="role-chips"></div>
+          <div class="card-title" style="margin-top:18px">Resume</div>
+          <div class="resume-row">
+            <span class="file-pill">📄 Shivayogi_From_15082026.pdf</span>
+            <span class="ok-pill">✓ extracted</span>
+          </div>
+          <p class="hint">20+ yrs · AI/ML, MLOps, FullStack · extracted text drives every match % below.</p>
+        </div>
+      </div>
+
+      <div class="card fill-card">
+        <div class="card-title">Agent fill pack — what gets typed into application forms</div>
+        <div class="fill-cols">
+          <div>
+            <div class="fill-count" id="fill-ready">—</div>
+            <div class="fill-label">answers ready (identity, employment history, education, screening)</div>
+          </div>
+          <div>
+            <div class="fill-count need" id="fill-need">—</div>
+            <div class="fill-label">questions only you can answer before I fill</div>
+          </div>
+        </div>
+        <ul class="fill-ask" id="fill-ask"></ul>
+      </div>
+
+      <div class="panel-foot">
+        <button class="btn primary" data-goto="boards">Continue → connect job boards</button>
+      </div>
+    </section>
+
+    <!-- Step 2: boards -->
+    <section class="panel" id="panel-boards">
+      <header class="panel-head">
+        <h1>Connect your job boards</h1>
+        <p class="sub">Boards connect through <b>your own browser session</b> — credentials never pass through this app. LinkedIn is session-gated: the agent opens each job in your logged-in tab and waits for your approval.</p>
+      </header>
+
+      <div class="board-grid" id="board-grid"><!-- built by app.js --></div>
+
+      <div class="panel-foot">
+        <button class="btn ghost" data-goto="profile">← back</button>
+        <button class="btn primary" data-goto="match">Continue → see match %</button>
+      </div>
+    </section>
+
+    <!-- Step 3: match -->
+    <section class="panel" id="panel-match">
+      <header class="panel-head row">
+        <div>
+          <h1>Match % against your resume</h1>
+          <p class="sub">Real scores from <code>ranked_jobs.json</code> — 210 LinkedIn jobs ranked by <code>match_jobs.py</code>.</p>
+        </div>
+        <div class="match-controls">
+          <input id="job-search" type="search" placeholder="filter title / company…" />
+          <select id="job-minmatch">
+            <option value="0">any match %</option>
+            <option value="50">≥ 50%</option>
+            <option value="70" selected>≥ 70%</option>
+            <option value="85">≥ 85%</option>
+          </select>
+        </div>
+      </header>
+
+      <div class="job-list" id="job-list"><!-- built by app.js --></div>
+
+      <div class="panel-foot">
+        <button class="btn ghost" data-goto="boards">← back</button>
+        <button class="btn primary" data-goto="approve">Continue → approval queue →</button>
+      </div>
+    </section>
+
+    <!-- Step 4: approval -->
+    <section class="panel" id="panel-approve">
+      <header class="panel-head">
+        <h1>Approval queue</h1>
+        <p class="sub">Nothing is submitted without you. Approve the ones you want; the agent applies only to approved jobs.</p>
+      </header>
+
+      <div class="queue" id="queue"><!-- built by app.js --></div>
+
+      <div class="panel-foot">
+        <button class="btn ghost" data-goto="match">← back</button>
+        <button class="btn primary" id="btn-apply-approved">Apply to approved jobs (agent submits) →</button>
+      </div>
+    </section>
+
+    <!-- Step 5: apply + digest -->
+    <section class="panel" id="panel-apply">
+      <header class="panel-head">
+        <h1>Agent apply log</h1>
+        <p class="sub">For every job you approved, the extension's autopilot opens the real job page in your logged-in browser, fills each field and <b>submits the application</b> — then reports the on-page confirmation back here. CAPTCHAs and questions only you can answer still halt it; those show up below.</p>
+      </header>
+
+      <div class="digest card">
+        <div class="card-title">Daily digest (06:00 IST)</div>
+        <div class="digest-body" id="digest-body">—</div>
+      </div>
+
+      <div class="timeline" id="timeline"><!-- built by app.js --></div>
+
+      <div class="panel-foot">
+        <button class="btn ghost" data-goto="approve">← back to queue</button>
+        <button class="btn ghost" id="btn-restart">↺ restart demo</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

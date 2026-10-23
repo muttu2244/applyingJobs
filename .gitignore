@@ -1,0 +1,6 @@
+*.mp4
+*.zip
+frame_*.png
+.freebuff/
+node_modules/
+*.log

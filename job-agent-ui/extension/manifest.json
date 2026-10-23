@@ -1,0 +1,117 @@
+{
+  "manifest_version": 3,
+  "name": "My Job Agent — Apply Agent",
+  "version": "2.12.4",
+  "description": "Fills your saved application data into Workday, Greenhouse, Lever, Ashby, LinkedIn, Indeed, Glassdoor, Wellfound, Internshala, Unstop, Cutshort, TopHire, LeetCode, GeeksforGeeks, AmbitionBox, HackerEarth and the Indian boards, advances multi-step forms, and submits — only on jobs you approved in your dashboard or when you press Fill & submit. Never pays, never fights CAPTCHAs, never guesses.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "http://127.0.0.1:8357/*",
+    "https://*.myworkdayjobs.com/*",
+    "https://*.workday.com/*",
+    "https://boards.greenhouse.io/*",
+    "https://*.greenhouse.io/*",
+    "https://jobs.lever.co/*",
+    "https://jobs.ashbyhq.com/*",
+    "https://*.linkedin.com/*",
+    "https://*.indeed.com/*",
+    "https://jobs.naukri.com/*",
+    "https://*.naukri.com/*",
+    "https://*.foundit.in/*",
+    "https://*.hirist.tech/*",
+    "https://*.instahyre.com/*",
+    "https://wellfound.com/*",
+    "https://cutshort.io/*",
+    "https://tophire.co/*",
+    "https://internshala.com/*",
+    "https://unstop.com/*",
+    "https://www.glassdoor.com/*",
+    "https://glassdoor.co.in/*",
+    "https://leetcode.com/*",
+    "https://apply.workable.com/*",
+    "https://www.geeksforgeeks.org/*",
+    "https://www.ambitionbox.com/*",
+    "https://www.hackerearth.com/*"
+  ],
+  "action": {
+    "default_title": "Fill & submit this application from my job agent pack",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.myworkdayjobs.com/*",
+        "https://*.workday.com/*",
+        "https://boards.greenhouse.io/*",
+        "https://*.greenhouse.io/*",
+        "https://jobs.lever.co/*",
+        "https://jobs.ashbyhq.com/*",
+        "https://*.linkedin.com/*",
+        "https://*.indeed.com/*",
+        "https://jobs.naukri.com/*",
+        "https://*.naukri.com/*",
+        "https://*.foundit.in/*",
+        "https://*.hirist.tech/*",
+        "https://*.instahyre.com/*",
+        "https://wellfound.com/*",
+        "https://cutshort.io/*",
+        "https://tophire.co/*",
+        "https://internshala.com/*",
+        "https://unstop.com/*",
+        "https://www.glassdoor.com/*",
+        "https://glassdoor.co.in/*",
+        "https://leetcode.com/*",
+        "https://apply.workable.com/*",
+        "https://www.geeksforgeeks.org/*",
+        "https://www.ambitionbox.com/*",
+        "https://www.hackerearth.com/*"
+      ],
+      "js": [
+        "fillpack.js",
+        "matcher.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://*.myworkdayjobs.com/*",
+        "https://*.workday.com/*",
+        "https://boards.greenhouse.io/*",
+        "https://*.greenhouse.io/*",
+        "https://jobs.lever.co/*",
+        "https://jobs.ashbyhq.com/*",
+        "https://*.linkedin.com/*",
+        "https://*.indeed.com/*",
+        "https://jobs.naukri.com/*",
+        "https://*.naukri.com/*",
+        "https://*.foundit.in/*",
+        "https://*.hirist.tech/*",
+        "https://*.instahyre.com/*",
+        "https://wellfound.com/*",
+        "https://cutshort.io/*",
+        "https://tophire.co/*",
+        "https://internshala.com/*",
+        "https://unstop.com/*",
+        "https://www.glassdoor.com/*",
+        "https://glassdoor.co.in/*",
+        "https://leetcode.com/*",
+        "https://apply.workable.com/*",
+        "https://www.geeksforgeeks.org/*",
+        "https://www.ambitionbox.com/*",
+        "https://www.hackerearth.com/*"
+      ],
+      "js": [
+        "geo-shim.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ]
+}

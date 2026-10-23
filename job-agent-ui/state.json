@@ -1,0 +1,150 @@
+{
+  "boards": [
+    {
+      "id": "linkedin",
+      "name": "LinkedIn",
+      "kind": "session-gated",
+      "connected": false,
+      "note": "Session-gated — no apply API. The extension applies through your logged-in browser session: approve a job here and its autopilot fills and submits the application for you.",
+      "jobs": 210,
+      "loginUrl": "https://www.linkedin.com/login"
+    },
+    {
+      "id": "indeed",
+      "name": "Indeed",
+      "kind": "session-gated",
+      "connected": false,
+      "note": "Session-gated — no apply API. The extension applies through your logged-in browser session: approve a job here and its autopilot fills and submits the application for you.",
+      "jobs": 0,
+      "loginUrl": "https://www.indeed.com/account/login"
+    },
+    {
+      "id": "naukri",
+      "name": "Naukri",
+      "kind": "cookie-session",
+      "connected": false,
+      "note": "Applies via your browser session (cookie import). Approved jobs are filled and submitted by the extension's autopilot.",
+      "jobs": 0,
+      "loginUrl": "https://www.naukri.com/mnjuser/login"
+    },
+    {
+      "id": "foundit",
+      "name": "Foundit",
+      "kind": "cookie-session",
+      "connected": false,
+      "note": "Applies via your browser session (cookie import). Approved jobs are filled and submitted by the extension's autopilot.",
+      "jobs": 0,
+      "loginUrl": "https://www.foundit.in/srp/login"
+    },
+    {
+      "id": "hirist",
+      "name": "Hirist",
+      "kind": "cookie-session",
+      "connected": false,
+      "note": "Applies via your browser session (cookie import). Approved jobs are filled and submitted by the extension's autopilot.",
+      "jobs": 0,
+      "loginUrl": "https://www.hirist.tech/login"
+    },
+    {
+      "id": "instahyre",
+      "name": "Instahyre",
+      "kind": "cookie-session",
+      "connected": false,
+      "note": "Applies via your browser session (cookie import). Approved jobs are filled and submitted by the extension's autopilot.",
+      "jobs": 0,
+      "loginUrl": "https://www.instahyre.com/login/"
+    },
+    {
+      "id": "wellfound",
+      "name": "Wellfound",
+      "kind": "session-gated",
+      "connected": false,
+      "note": "Session-gated — no apply API. The extension applies through your logged-in browser session: approve a job here and its autopilot fills and submits the application for you.",
+      "jobs": 0,
+      "loginUrl": "https://wellfound.com/login"
+    },
+    {
+      "id": "cutshort",
+      "name": "Cutshort",
+      "kind": "session-gated",
+      "connected": false,
+      "note": "Session-gated — no apply API. The extension applies through your logged-in browser session: approve a job here and its autopilot fills and submits the application for you.",
+      "jobs": 0,
+      "loginUrl": "https://cutshort.io/"
+    },
+    {
+      "id": "tophire",
+      "name": "TopHire",
+      "kind": "session-gated",
+      "connected": false,
+      "note": "Profile-based — TopHire has no per-job listings; companies review your profile and reach out. The extension still fills its sign-up and profile forms.",
+      "jobs": 0,
+      "loginUrl": "https://tophire.co/"
+    },
+    {
+      "id": "internshala",
+      "name": "Internshala",
+      "kind": "session-gated",
+      "connected": false,
+      "note": "Session-gated — no apply API. The extension applies through your logged-in browser session: approve a job here and its autopilot fills and submits the application for you.",
+      "jobs": 0,
+      "loginUrl": "https://internshala.com/login"
+    },
+    {
+      "id": "unstop",
+      "name": "Unstop",
+      "kind": "session-gated",
+      "connected": false,
+      "note": "Session-gated — no apply API. The extension applies through your logged-in browser session: approve a job here and its autopilot fills and submits the application for you.",
+      "jobs": 0,
+      "loginUrl": "https://unstop.com/login"
+    },
+    {
+      "id": "glassdoor",
+      "name": "Glassdoor",
+      "kind": "session-gated",
+      "connected": false,
+      "note": "Session-gated — no apply API. The extension applies through your logged-in browser session: approve a job here and its autopilot fills and submits the application for you.",
+      "jobs": 0,
+      "loginUrl": "https://www.glassdoor.com/Jobs/"
+    },
+    {
+      "id": "leetcode",
+      "name": "LeetCode",
+      "kind": "session-gated",
+      "connected": false,
+      "note": "Session-gated — LeetCode's job board has no apply API. The extension applies through your logged-in browser session.",
+      "jobs": 0,
+      "loginUrl": "https://leetcode.com/accounts/login/"
+    },
+    {
+      "id": "geeksforgeeks",
+      "name": "GeeksforGeeks",
+      "kind": "session-gated",
+      "connected": false,
+      "note": "Session-gated — GfG Get Hired has no apply API. The extension applies through your logged-in browser session.",
+      "jobs": 0,
+      "loginUrl": "https://auth.geeksforgeeks.org/?to=https://www.geeksforgeeks.org/jobs/"
+    },
+    {
+      "id": "ambitionbox",
+      "name": "AmbitionBox",
+      "kind": "session-gated",
+      "connected": false,
+      "note": "Session-gated — no apply API. The extension applies through your logged-in browser session: approve a job here and its autopilot fills and submits the application for you.",
+      "jobs": 0,
+      "loginUrl": "https://www.ambitionbox.com/"
+    },
+    {
+      "id": "hackerearth",
+      "name": "HackerEarth",
+      "kind": "session-gated",
+      "connected": false,
+      "note": "Session-gated — no apply API. The extension applies through your logged-in browser session: approve a job here and its autopilot fills and submits the application for you.",
+      "jobs": 0,
+      "loginUrl": "https://www.hackerearth.com/login/"
+    }
+  ],
+  "decisions": {},
+  "log": []
+}
