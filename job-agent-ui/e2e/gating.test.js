@@ -1,13 +1,31 @@
-/* gating.test.js — connection gates jobs, for EVERY board.
+/* gating.test.js — the JOB-CARD contract, for every board.
  *
- * The bug: /api/bootstrap served every job in ranked_jobs.json regardless of a
- * board's `connected` flag, so LinkedIn jobs were "matched" while the card said
- * "not connected". This asserts the fix across all 16 boards.
+ * What this file used to assert (jobs hidden until their board was connected)
+ * is gone: the dashboard is a list of real jobs, and the board connection is
+ * established behind the scenes when the user presses Apply. So the contract
+ * now is:
+ *
+ *   1. every matched job from every known board is served while NOTHING is
+ *      connected — connection is not a filter on visibility;
+ *   2. each served job is card-shaped: a board id + board name, a title, a
+ *      description, a match %, and a usable URL;
+ *   3. a listing whose URL maps to no known board is never served (nothing
+ *      could ever be applied to it);
+ *   4. a job reported APPLIED disappears from the list for good, and is kept
+ *      in appliedJobs for the digest;
+ *   5. connecting / disconnecting changes no card — it only decides whether
+ *      /api/harvest accepts new listings;
+ *   6. one-click Apply: queueing (action:"apply") creates the run ledger, and
+ *      /api/apply/kick answers `needLogin` with the board the user must sign
+ *      in on — then hands the queued job out exactly once after the session
+ *      verdict arrives;
+ *   7. action/report keep resolving jobs whose board is disconnected (an
+ *      in-flight application never 404s mid-report).
  *
  * Safety: snapshots state.json and ranked_jobs.json first, appends synthetic
- * jobs (one per board + one unknown host), runs the connect/disconnect matrix,
- * then restores both files byte-for-byte and re-verifies the restore. The user's
- * real decisions, log and job data survive untouched.
+ * jobs (one per board + one unknown host), runs the matrix, then restores both
+ * files byte-for-byte and re-verifies the restore. The user's real decisions,
+ * log and job data survive untouched.
  *
  * Exit code 0 only if every assertion passes.
  */
@@ -47,17 +65,22 @@ function req(method, p, body) {
   });
 }
 
+const boot = async () => (await req("GET", "/api/bootstrap")).body;
+
 (async () => {
   const stateSnap = fs.readFileSync(STATE);
   const rankedSnap = fs.readFileSync(RANKED);
   const harvestExisted = fs.existsSync(HARVEST);
   const harvestSnap = harvestExisted ? fs.readFileSync(HARVEST) : null;
-  /* The pre-test board table, taken from the server itself BEFORE the harvest
-   * file is cleared: harvest.json legitimately holds live listings now, so
-   * counting them by hand (the old LinkedIn-only arithmetic) would misread a
-   * correctly restored state as a failure. */
-  const bootBefore = (await req("GET", "/api/bootstrap")).body;
+  /* The pre-test table, taken from the server itself BEFORE the harvest file
+   * is cleared: harvest.json legitimately holds live listings now. */
+  const bootBefore = await boot();
   fs.writeFileSync(HARVEST, JSON.stringify({ entries: [], fetchedAt: {} }));
+  /* Close whatever run the user's own session left open, so the queue this
+   * test inspects is only the one it creates. */
+  await req("POST", "/api/apply/stop");
+  /* Base-index baseline: harvest cleared, synthetic jobs not added yet. */
+  const bootCleared = await boot();
   const originalState = JSON.parse(stateSnap.toString("utf8"));
   const originalRanked = JSON.parse(rankedSnap.toString("utf8"));
 
@@ -98,71 +121,86 @@ function req(method, p, body) {
     });
     fs.writeFileSync(RANKED, JSON.stringify(originalRanked.concat(extra), null, 1));
 
-    /* baseline: everything disconnected */
+    /* --- 1. nothing connected, jobs still served --- */
     for (const id of boardIds) await req("POST", `/api/boards/${id}/connect`, { connected: false });
-    let b = (await req("GET", "/api/bootstrap")).body;
+    let b = await boot();
     check("baseline: all boards disconnected", b.boards.every((x) => !x.connected),
       b.boards.filter((x) => x.connected).map((x) => x.id));
-    check("baseline: no jobs flow at all", b.jobs.length === 0, b.jobs.length);
-    check("baseline: every board card count is 0", b.boards.every((x) => x.jobs === 0),
-      b.boards.map((x) => `${x.id}:${x.jobs}`));
+    const expected = bootCleared.jobs.length + boardIds.length;   // + one synthetic per board
+    check(`baseline: every matched job is served (${expected}), connection is not a filter`,
+      b.jobs.length === expected, { got: b.jobs.length, want: expected });
+    check("every served job belongs to a known board", b.jobs.every((j) => !!j.board),
+      b.jobs.filter((j) => !j.board).slice(0, 3));
+    check("unknown-host job is never served",
+      !b.jobs.some((j) => /totally-unknown-board/.test(j.url)), null);
 
-    /* expected per-board totals: real ranked jobs mapped to it + 1 synthetic.
-     * Mirrors server.js boardOf(): exact host or "." + domain suffix. */
-    const DOMS = {
-      linkedin: "linkedin.com", indeed: "indeed.com", naukri: "naukri.com",
-      foundit: "foundit.in", hirist: "hirist.tech", instahyre: "instahyre.com",
-      wellfound: "wellfound.com", cutshort: "cutshort.io", tophire: "tophire.co",
-      internshala: "internshala.com", unstop: "unstop.com",
-      glassdoor: "glassdoor.co.in", leetcode: "leetcode.com",
-      geeksforgeeks: "geeksforgeeks.org", ambitionbox: "ambitionbox.com",
-      hackerearth: "hackerearth.com",
-    };
-    const counts = {};
-    for (const j of originalRanked) {
-      let h = "";
-      try { h = new URL(j.job_detail_url).hostname.toLowerCase(); } catch {}
-      const id = boardIds.find((bid) => h === DOMS[bid] || h.endsWith("." + DOMS[bid]));
-      if (id) counts[id] = (counts[id] || 0) + 1;
-    }
-    console.log(`(real ranked jobs per board: ${JSON.stringify(counts)})`);
+    /* --- 2. cards carry what the UI renders --- */
+    const shaped = b.jobs.filter((j) => typeof j.title === "string" && j.title.trim() &&
+      typeof j.desc === "string" && j.desc.trim() &&
+      typeof j.boardName === "string" && j.boardName.trim() &&
+      Number.isFinite(j.match) && /^https?:\/\//i.test(j.url || ""));
+    check("every job is card-shaped (title, desc, boardName, match, url)",
+      shaped.length === b.jobs.length, { shaped: shaped.length, total: b.jobs.length, sample: b.jobs.find((j) => !j.desc || !j.boardName) });
+    const boards = Object.fromEntries(b.boards.map((x) => [x.id, x]));
+    const missingCardColor = b.jobs.filter((j) => !boards[j.board]);
+    check("each card's board exists in the board table", missingCardColor.length === 0,
+      missingCardColor.slice(0, 3).map((j) => j.board));
 
-    /* --- matrix: connect one board at a time ---
-     * connect is a claim; the extension's session verdict is what connects
-     * (session.test.js owns that contract — here we play the extension). */
+    /* --- 3. an applied job leaves the list for good --- */
+    const applied = b.jobs[0];
+    await req("POST", `/api/jobs/${applied.id}/action`, { action: "apply" });
+    const rep = await req("POST", `/api/jobs/${applied.id}/report`, { status: "applied", confirmation: "gating-test" });
+    check("report marks it applied", rep.status === 200 && rep.body.decisions[applied.id].action === "applied", rep.body && rep.body.decisions[applied.id]);
+    b = await boot();
+    check("applied job is gone from the card list", !b.jobs.some((j) => j.id === applied.id), applied.id);
+    check("applied job is kept for the digest", b.appliedJobs.some((j) => j.id === applied.id),
+      b.appliedJobs.slice(0, 3));
+
+    /* --- 4. connecting/disconnecting changes no card --- */
+    const beforeIds = b.jobs.map((j) => j.id);
     for (const id of boardIds) {
       await req("POST", `/api/boards/${id}/connect`, { connected: true });
       await req("POST", `/api/boards/${id}/session`, { ok: true });
-      b = (await req("GET", "/api/bootstrap")).body;
-      const jobs = b.jobs;
-      const boards = Object.fromEntries(b.boards.map((x) => [x.id, x]));
-      const foreign = jobs.filter((j) => j.board !== id);
-      const expectedReal = id === "linkedin" ? (counts.linkedin || 0) : 0;
-      const expectedTotal = expectedReal + 1; // + the synthetic job
-      check(`${id}: connected -> jobs visible (${expectedTotal})`, jobs.length === expectedTotal,
-        { got: jobs.length, want: expectedTotal });
-      check(`${id}: every visible job belongs to it`, foreign.length === 0,
-        foreign.slice(0, 3).map((j) => j.board));
-      check(`${id}: its card count = ${expectedTotal}`, boards[id].jobs === expectedTotal, boards[id].jobs);
-      const otherCounts = Object.entries(boards).filter(([k]) => k !== id && k !== "UNKNOWN")
-        .filter(([, v]) => v.jobs !== 0);
-      check(`${id}: all other cards read 0`, otherCounts.length === 0, otherCounts);
-      check(`${id}: unknown-host job never visible`, !jobs.some((j) => j.board == null), null);
-
       await req("POST", `/api/boards/${id}/connect`, { connected: false });
-      b = (await req("GET", "/api/bootstrap")).body;
-      check(`${id}: disconnected -> hidden again`, b.jobs.length === 0, b.jobs.length);
     }
+    b = await boot();
+    check("connect/disconnect matrix leaves every card untouched",
+      JSON.stringify(b.jobs.map((j) => j.id)) === JSON.stringify(beforeIds),
+      { before: beforeIds.length, after: b.jobs.length });
 
-    /* report/action endpoints must still resolve jobs while their board is
-     * disconnected — an in-flight application never 404s mid-report. */
-    b = (await req("GET", "/api/bootstrap")).body;
-    const linkedinJobs = originalRanked.length; // first real job id = 0
-    const act = await req("POST", `/api/jobs/0/action`, { action: "approve" });
-    check("action endpoint resolves a hidden job (no 404)", act.status === 200, act);
-    const rep = await req("POST", `/api/jobs/0/report`, { status: "captcha", message: "gating-test" });
-    check("report endpoint resolves a hidden job (no 404)", rep.status === 200, rep);
-    check("job count sanity: original ranked size", Number.isInteger(linkedinJobs) && linkedinJobs > 0);
+    /* --- 5. one-click Apply: queue -> needLogin -> handout --- */
+    const target = b.jobs.find((j) => j.id !== applied.id);
+    const q = await req("POST", `/api/jobs/${target.id}/action`, { action: "apply" });
+    check("Apply queues the job and opens a run", q.status === 200 && q.body.run && q.body.run.total >= 1, q.body && q.body.run);
+    check("decision is \"apply\" (never \"applied\")",
+      (await boot()).decisions[target.id].action === "apply");
+    let k = (await req("POST", "/api/apply/kick", {})).body;
+    check("kick with no verified session -> needLogin for this job's board",
+      k.needLogin === target.board && typeof k.boardName === "string" && !!k.open, k);
+    check("kick opens no job while the board is not connected", !k.job, k.job);
+
+    await req("POST", `/api/boards/${target.board}/connect`, { connected: true });
+    await req("POST", `/api/boards/${target.board}/session`, { ok: true, detail: "gating-test" });
+    k = (await req("POST", "/api/apply/kick", {})).body;
+    check("verified session -> the queued job is handed out", k.job && k.job.id === target.id, k);
+    check("handed-out job carries the card fields the page needs",
+      k.job && k.job.title && k.job.url && k.job.board === target.board, k.job);
+    const k2 = (await req("POST", "/api/apply/kick", {})).body;
+    check("a second kick waits instead of stacking a tab", k2.waiting === true && !k2.job, k2);
+
+    /* A report concludes it: the card disappears and the run records it. */
+    await req("POST", `/api/jobs/${target.id}/report`, { status: "applied", confirmation: "gating-test" });
+    b = await boot();
+    check("applied via one-click -> card gone", !b.jobs.some((j) => j.id === target.id), target.id);
+    check("run records the applied result", b.run && b.run.applied >= 1, b.run);
+
+    /* --- 6. action/report never 404 mid-flight --- */
+    await req("POST", `/api/boards/${target.board}/connect`, { connected: false });
+    const act = await req("POST", `/api/jobs/${applied.id}/action`, { action: "approve" });
+    check("action endpoint resolves a job whose board is disconnected (no 404)", act.status === 200, act);
+    const rep2 = await req("POST", `/api/jobs/${applied.id}/report`, { status: "captcha", message: "gating-test" });
+    check("report endpoint resolves it too (no 404)", rep2.status === 200, rep2);
+    await req("POST", "/api/apply/stop");
   } finally {
     fs.writeFileSync(STATE, stateSnap);
     fs.writeFileSync(RANKED, rankedSnap);
@@ -175,12 +213,10 @@ function req(method, p, body) {
   /* restore verified byte-for-byte */
   check("state.json restored byte-for-byte", fs.readFileSync(STATE).equals(stateSnap));
   check("ranked_jobs.json restored byte-for-byte", fs.readFileSync(RANKED).equals(rankedSnap));
-  const after = (await req("GET", "/api/bootstrap")).body;
-  check("post-restore bootstrap matches original connection flags",
-    JSON.stringify(after.boards.map((x) => [x.id, x.connected, x.jobs])) ===
-    JSON.stringify(bootBefore.boards.map((x) => [x.id, x.connected, x.jobs])),
-    { after: after.boards.map((x) => [x.id, x.connected, x.jobs]),
-      before: bootBefore.boards.map((x) => [x.id, x.connected, x.jobs]) });
+  const after = await boot();
+  check("post-restore bootstrap matches the original job list",
+    JSON.stringify(after.jobs.map((j) => j.id)) === JSON.stringify(bootBefore.jobs.map((j) => j.id)),
+    { after: after.jobs.length, before: bootBefore.jobs.length });
 
   console.log(`\n${pass} passed, ${fail} failed`);
   process.exit(fail ? 1 : 0);

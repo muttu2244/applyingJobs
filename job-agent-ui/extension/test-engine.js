@@ -147,7 +147,17 @@ globalThis.document = {
     if (sel.includes("input[type=radio]")) {
       return PAGE_FIELDS.filter((f) => f.type === "radio" || f.type === "checkbox");
     }
-    if (sel.includes("[role=button]")) return PAGE_BUTTONS;   // CLICKABLE selector
+    /* Two gates ask for passwords: sessionVerdict wants buttons AND passwords
+     * in ONE selector ("button, a, [role=button], input[type=password], img"),
+     * the account-wall gate wants passwords alone. So whenever the selector
+     * mentions buttons, hand back the buttons plus any password fields it also
+     * asks for — answering passwords-only left sessionVerdict with nothing to
+     * read and flipped two verdicts to "no evidence". */
+    if (sel.includes("[role=button]")) {
+      return PAGE_BUTTONS.concat(
+        sel.includes("input[type=password]") ? PAGE_FIELDS.filter((f) => f.type === "password") : []);
+    }
+    if (sel.includes("input[type=password]")) return PAGE_FIELDS.filter((f) => f.type === "password");
     if (sel.includes("[class*='error'") || sel.includes("[role=alert]")) return PAGE_ERRORS;
     const m = /input\[name="(.+?)"\]/.exec(sel);
     if (m) return PAGE_FIELDS.filter((f) => f.name === m[1]);
@@ -469,6 +479,54 @@ function buildDangerButtons(submitExtra) {
   check("autopilot: approved job submitted", submitA._clicked === true);
   check("autopilot: field filled", PAGE_FIELDS[0].value === "Shivayogi", PAGE_FIELDS[0].value);
   check("autopilot: reported to dashboard", reported.length === 1 && reported[0].status === "applied", reported);
+
+  /* --- 12a2. a report the dashboard never receives is RETRIED, not lost ---
+   * The card leaves the list only when /report records it, so the verdict is
+   * written to chrome.storage.local first and deleted only on a server ACK.
+   * Otherwise a server restart mid-application would leave an already-
+   * submitted job on the cards for good — exactly the complaint. */
+  {
+    const mem = {};
+    delete globalThis.chrome;
+    globalThis.chrome = {
+      storage: { local: {
+        async get(k) { return { [k]: mem[k] }; },
+        async set(o) { Object.assign(mem, o); },
+        async remove(k) { delete mem[k]; },
+      } },
+    };
+    let up = false;                       // the dashboard is down for round one
+    globalThis.fetch = async (url) => {
+      if (String(url).endsWith("/api/bootstrap")) {
+        return { ok: true, json: async () => ({
+          jobs: [{ id: 55, url: PAGE_URL, title: "Durable Job", company: "Acme" }],
+          decisions: { 55: { action: "apply", ts: 1 } },
+        }) };
+      }
+      if (String(url).includes("/report")) {
+        return up ? { ok: true, json: async () => ({ ok: true }) }
+                  : { ok: false, json: async () => null };
+      }
+      return { ok: false, json: async () => null };
+    };
+
+    const submitDown = mkAutoFixture();
+    api = loadEngine();
+    await api.autopilot();
+    check("durable report: the page still submits with the dashboard down", submitDown._clicked === true);
+    check("durable report: verdict kept when the POST is not acknowledged",
+      !!(mem["pendingReport:55"] && mem["pendingReport:55"].status === "applied"),
+      mem);
+
+    up = true;                            // dashboard back up
+    const submitUp = mkAutoFixture();
+    api = loadEngine();
+    await api.autopilot();
+    check("durable report: re-sent once the dashboard answers", submitUp._clicked === true);
+    check("durable report: cleared only after the server acknowledges",
+      !mem["pendingReport:55"], mem);
+    delete globalThis.chrome;
+  }
 
   /* --- 12b. apply-run chain: after reporting, the page asks the dashboard
    *        for the NEXT queued job and has the worker open it. That handoff is
@@ -1469,6 +1527,66 @@ function buildDangerButtons(submitExtra) {
   check("two-hop: the form behind it was filled", res.filled.some((f) => f.key === "identity.firstName"), res.filled);
   check("two-hop: run completed", res.ok === true && res.submitted === true, res);
   PAGE_URL = "https://jobs.example.com/apply/123";   // restore for readability
+
+  /* --- 47b. A REAL Workday chooser: its routes are "Autofill with Resume",
+   *        "Apply Manually", "Use My Last Application" — none is an Apply
+   *        label, which dead-ended every Workday application on the step that
+   *        exists to open the form. "Apply Manually" must win (the resume
+   *        route needs a file upload this extension never performs). Labels
+   *        and hrefs below were read off a live
+   *        salesforce.wd12.myworkdayjobs.com posting. --- */
+  PAGE_URL = "https://acme.wd1.myworkdayjobs.com/External/job/Y";
+  PAGE_FIELDS = [];
+  PAGE_BUTTONS = [];
+  let pickedManual = 0, pickedResume = 0;
+  PAGE_APPLY_ANCHORS = ["Autofill with Resume", "Apply Manually", "Use My Last Application"].map((label) => {
+    const a = makeInput({
+      tagName: "A", textContent: label, className: "css-8qaacw",
+      href: `https://acme.wd1.myworkdayjobs.com/External/job/Y/apply/${label.replace(/\s+/g, "")}`,
+      attrs: { role: "button" },
+      onClick: () => {
+        if (label === "Autofill with Resume") pickedResume++; else pickedManual++;
+        PAGE_APPLY_ANCHORS = [];
+        PAGE_FIELDS = [makeInput({ type: "text", label: "First Name", name: "first_name" })];
+        PAGE_BUTTONS = [makeButton("Submit application", (el) => { el._clicked = true; BODY_TEXT = "Thank you! Your application was submitted."; })];
+      },
+    });
+    a.innerText = label;          // a real <a> answers both, same string
+    return a;
+  });
+  BODY_TEXT = "";
+  api = loadEngine();
+  res = await api.run({ submit: true });
+  check("workday chooser: 'Apply Manually' is the route taken", pickedManual === 1, { pickedManual, pickedResume });
+  check("workday chooser: the resume-upload route is never clicked", pickedResume === 0, pickedResume);
+  check("workday chooser: the form behind it is filled and submitted", res.ok === true && res.submitted === true, res);
+  PAGE_APPLY_ANCHORS = [];
+
+  /* --- 47c. The wall behind that route: Workday asks for an account
+   *        (email + password + verify) before ANY application field. A
+   *        password is a credential the agent never types, so the run must
+   *        stop and SAY so — the generic "no submit control" report sent the
+   *        user looking for a broken selector instead of a login. --- */
+  PAGE_URL = "https://acme.wd1.myworkdayjobs.com/External/job/Y/apply/applyManually";
+  PAGE_FIELDS = [
+    makeInput({ type: "text", label: "Email Address", name: "email" }),
+    makeInput({ type: "password", label: "Password", name: "password" }),
+    makeInput({ type: "password", label: "Verify New Password", name: "verifyPassword" }),
+  ];
+  const createAcct = makeButton("Create Account");
+  PAGE_BUTTONS = [createAcct, makeButton("Sign In")];
+  BODY_TEXT = "";
+  api = loadEngine();
+  res = await api.run({ submit: true });
+  check("workday account wall: halts as needs-account", res.ok === false && res.reason === "needs-account", res);
+  check("workday account wall: names the account step", /"Create Account"/.test(res.message || ""), res.message);
+  check("workday account wall: tells the user to do it once, then re-apply",
+    /create the account or sign in once/i.test(res.message || "") && /press Apply again/i.test(res.message || ""), res.message);
+  check("workday account wall: never clicks into the signup", createAcct._clicked !== true, createAcct._clicked);
+  check("workday account wall: types no password", !res.filled.some((f) => /password/i.test(String(f.key || ""))), res.filled);
+  PAGE_FIELDS = [];
+  PAGE_BUTTONS = [];
+  PAGE_URL = "https://jobs.example.com/apply/123";
 
   /* --- 48. session verification: connect trusts EVIDENCE on the board
    *        page, never the click. The verdict feeds /api/boards/:id/session,

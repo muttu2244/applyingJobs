@@ -1,2 +1,3 @@
-2026/10/22-09:58:17.982 5ac0 Creating DB C:\Projects\ApplyingJobsFrom_LinkedInScraping_Project\job-agent-ui\e2e\.profile-queue\Default\Local Storage\leveldb since it was missing.
-2026/10/22-09:58:18.086 5ac0 Reusing MANIFEST C:\Projects\ApplyingJobsFrom_LinkedInScraping_Project\job-agent-ui\e2e\.profile-queue\Default\Local Storage\leveldb/MANIFEST-000001
+2026/10/25-13:15:30.734 4e30 Reusing MANIFEST C:\Projects\ApplyingJobsFrom_LinkedInScraping_Project\job-agent-ui\e2e\.profile-queue\Default\Local Storage\leveldb/MANIFEST-000001
+2026/10/25-13:15:30.737 4e30 Recovering log #3
+2026/10/25-13:15:30.750 4e30 Reusing old log C:\Projects\ApplyingJobsFrom_LinkedInScraping_Project\job-agent-ui\e2e\.profile-queue\Default\Local Storage\leveldb/000003.log 

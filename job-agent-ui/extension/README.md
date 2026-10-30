@@ -107,6 +107,15 @@ it within 5 minutes, re-checking the dashboard decision first. Any concluded
 run — applied or halted — clears the marker, and an already-`applied` job is
 never touched again.
 
+**Reports survive a restart.** A submitted job's card leaves the dashboard
+only when its report reaches the dashboard, and that POST can die with a
+restarting server or a closing tab. The verdict is therefore written to
+`chrome.storage.local` *before* the send and deleted only on a server
+acknowledgement; the service worker re-sends whatever was never acknowledged,
+at browser startup and on every wake. A job you have already applied to is
+never listed again, however many times the dashboard or the browser restarts
+in between.
+
 **Per page.** Open any application, click the extension icon:
 
 - **Fill & submit** — fills every field, clicks through Next/Continue steps,
@@ -409,6 +418,14 @@ site.
   real chunk of work.
 - File uploads (resume/CV) depend on the board pre-attaching your stored
   resume; the extension never uploads a file itself.
+- Workday's application chooser ("Autofill with Resume" / "Apply Manually" /
+  "Use My Last Application") **is** handled — "Apply Manually" is preferred,
+  because the resume route needs that upload. What is not handled is the
+  account it asks for next: **Create Account** wants a password, which is a
+  credential the agent never types. Create the Workday account (or sign in)
+  once by hand on that tenant; the saved session covers every later job there,
+  and the halt message (`needs-account`) names the wall instead of reporting a
+  missing submit button.
 - Form layouts vary. If a field is missed, the halt message names the question
   text, the machine name, the control type and (for a dropdown) the options it
   offered — that is enough to add the rule to `matcher.js` in one pass.

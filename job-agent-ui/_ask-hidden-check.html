@@ -1,0 +1,20 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>ask[hidden] check</title>
+<style>
+  /* --- copied verbatim from job-agent-ui/styles.css (the two rules that
+   * contest `display` on this box; no other selector in that file touches
+   * `.ask`) --- */
+  .ask {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    flex-wrap: wrap; margin-bottom: 16px; padding: 13px 16px;
+    border: 1px solid rgba(251,191,36,.4); border-radius: var(--radius);
+    background: rgba(251,191,36,.08); color: #f3ddb0; font-size: 13px;
+  }
+  .ask[hidden] { display: none; }
+</style>
+
+<!-- Exactly what app.js leaves behind when there is nothing to ask -->
+<div class="ask" id="connect-ask" hidden></div>
+<!-- The box when a board needs connecting (must still show) -->
+<div class="ask" id="ask-visible">Sign in here once and the agent applies.</div>

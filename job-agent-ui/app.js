@@ -83,7 +83,14 @@ function renderProfile() {
   }
 }
 
-/* ---------- step 2: boards ---------- */
+/* ---------- step 2: jobs ----------
+ * This step is the JOB LIST, not a board list: the boards themselves are an
+ * implementation detail the user never has to manage. Every matched job from
+ * every board is one card (title, description, location, experience, board)
+ * with a single Apply button, and the connection to that board is established
+ * behind the scenes when Apply is pressed — the extension opens the job page,
+ * verifies (or asks for) the sign-in, fills the form and submits it. An
+ * applied job leaves the list for good (the server stops serving it). */
 const BOARD_COLORS = {
   linkedin: "#0a66c2", indeed: "#2557a7", naukri: "#4a90d9", foundit: "#ff6b35",
   hirist: "#22c55e", instahyre: "#e11d48",
@@ -104,84 +111,204 @@ function ago(ts) {
   return h < 24 ? `${h}h ago` : `${Math.round(h / 24)}d ago`;
 }
 
-function renderBoards() {
-  $("#board-grid").innerHTML = DATA.boards.map((b) => {
-    const s = b.session || {};
-    const pend = !!s.pending;
-    const lost = !b.connected && s.ok === false && !s.unknown && !pend;
-    const status = b.connected ? "connected" : pend ? "verifying session…" : "not connected";
-    return `
-    <div class="board ${b.connected ? "connected" : ""}" data-board="${b.id}">
-      <div class="board-top">
-        <div class="board-logo" style="background:${BOARD_COLORS[b.id] || "#555"}">${esc(b.name.slice(0, 2))}</div>
-        <div>
-          <div class="board-name">${esc(b.name)}</div>
-          <span class="badge ${b.kind === "session-gated" ? "session" : "auto"}">
-            ${b.kind === "session-gated" ? "session-gated" : "cookie-session"}
-          </span>
-        </div>
+/* The board whose sign-in the agent needs before it can submit, as told by
+ * /api/apply/kick (needLogin). The card list says nothing about boards; this
+ * is the ONE moment a board is named — because only the user can log in. */
+const ASK = { board: null, name: "", open: "" };
+/* Jobs the agent is working on right now (queued/opened, not yet reported).
+ * A card shows "applying…" and then disappears when the submission lands. */
+const PENDING = new Set();
+let kickBusy = false;
+
+function jobCard(j) {
+  const [g, bg] = grade(j.match);
+  const d = DATA.decisions[j.id];
+  const queued = d && d.action === "apply";
+  const halted = queued && d.status && d.status !== "applied";
+  const busy = PENDING.has(j.id) || (queued && !halted);
+  const color = BOARD_COLORS[j.board] || "#3b6fe0";
+  const bits = [j.company, j.location, j.experience].filter(Boolean);
+  return `
+  <article class="jcard${busy ? " busy" : ""}" data-card="${j.id}">
+    <div class="jcard-top">
+      <div class="jcard-head">
+        <div class="jcard-title">${esc(j.title)}</div>
+        <div class="jcard-sub">${bits.map(esc).join(" · ")}</div>
       </div>
-      <p>${esc(b.note)}</p>
-      ${pend ? `<div class="hint"><b>${esc(b.name)}:</b> checking whether you're actually signed in — the board tab it opened tells us. Log in there if you haven't. ${s.pendingMs > 20000 ? `Still waiting after ${Math.round(s.pendingMs / 1000)}s — reload the extension at chrome://extensions (v2.12.0), or use "Connect without verifying".` : ""}</div>` : ""}
-      ${lost ? `<div class="hint"><b>${esc(b.name)}:</b> you're not signed in on the site — log in in the opened tab, then connect again.</div>` : ""}
-      ${b.sweep && b.sweep.status === "running" ? `<div class="hint"><b>${esc(b.name)}:</b> fetching all listings — page ${b.sweep.page || 0}/${b.sweep.maxPages || 1}, ${b.sweep.found || 0} new so far. Keep the board tab open.</div>` : ""}
-      ${b.sweep && b.sweep.status === "stalled" ? `<div class="hint"><b>${esc(b.name)}:</b> fetch-all stalled — the board tab closed or the extension reloaded, so no page progress arrived. Press <b>Fetch all jobs</b> to restart it.</div>` : ""}
-      ${b.sweep && b.sweep.status === "done" ? `<div class="hint"><b>${esc(b.name)}:</b> fetch-all finished — ${b.sweep.found || 0} new job${(b.sweep.found || 0) === 1 ? "" : "s"} from ${b.sweep.page || 1} page${(b.sweep.page || 1) === 1 ? "" : "s"}.</div>` : ""}
-      <div class="board-actions">
-        <span class="conn-dot"></span>
-        <span class="conn-label">${status}${b.connected && b.fetchedAt ? ` · fetched ${ago(b.fetchedAt)}` : ""}</span>
-        <span style="flex:1"></span>
-        ${b.connected
-          ? `<button class="btn small ok" data-fetch="${b.id}" ${b.sweep && b.sweep.status === "running" ? "disabled" : ""}>
-               ${b.sweep && b.sweep.status === "running" ? `Fetching… ${b.sweep.page || 0}/${b.sweep.maxPages || 1}` : "Fetch all jobs ⇣"}
-             </button>`
-          : `<a class="btn small" href="${esc(b.loginUrl)}" target="_blank" rel="noopener">Open login ↗</a>`}
-        <button class="btn small ${b.connected ? "bad" : "ok"}" data-connect="${b.id}">
-          ${b.connected ? "Disconnect" : pend ? "Connect without verifying" : "I'm signed in — connect"}
-        </button>
+      <span class="jboard" style="--bc:${color}">${esc(j.boardName || j.board)}</span>
+    </div>
+    <p class="jcard-desc">${esc(j.desc || "—")}</p>
+    <div class="jcard-foot">
+      <div class="jcard-meter">
+        <b class="${g}">${j.match}%</b>
+        <span class="bar"><i class="${bg}" style="width:${j.match}%"></i></span>
       </div>
-    </div>`;
-  }).join("");
+      ${busy
+        ? `<span class="jcard-busy">applying…</span>`
+        : halted
+          ? `<button class="btn small" data-apply-job="${j.id}" title="${esc(d.detail || d.status)}">Apply again</button>`
+          : `<button class="btn small primary" data-apply-job="${j.id}">Apply</button>`}
+    </div>
+  </article>`;
+}
+
+function renderCards() {
+  const q = ($("#card-search")?.value || "").toLowerCase();
+  const min = Number($("#card-minmatch")?.value || 0);
+  const list = (DATA.jobs || [])
+    .filter((j) => j.match >= min && (!q || `${j.title} ${j.company} ${j.boardName}`.toLowerCase().includes(q)))
+    .sort((a, b) => b.match - a.match);
+  $("#job-cards").innerHTML = list.length
+    ? list.map(jobCard).join("")
+    : `<div class="empty">${(DATA.jobs || []).length
+        ? "No jobs match that filter — loosen the % threshold or clear the search."
+        : "No jobs left to apply to. Every matched job has been applied to (applied jobs are removed from this list)."}</div>`;
+  renderAsk();
   updateStats();
 }
 
+/* The only board UI there is: one line, shown when Apply needs a sign-in. */
+function renderAsk() {
+  const box = $("#connect-ask");
+  if (!box) return;
+  if (!ASK.board) {
+    /* No relay on this page means no content script on any tab: Apply would
+     * queue a job, open a tab and then sit at "applying…" forever, which reads
+     * as "the buttons don't work". Say so instead. */
+    if (!document.documentElement.hasAttribute("data-job-agent-ext")) {
+      box.hidden = false;
+      box.innerHTML = `<div><b>The Job Agent extension isn't loaded in this browser.</b>
+        Nothing can fill or submit a job page without it — open <code>chrome://extensions</code>,
+        turn on Developer mode, choose “Load unpacked” and pick <code>job-agent-ui/extension</code>,
+        press its reload button, then reload this page.<br>
+        <span class="ask-note">This tab is <code>${esc(location.origin)}</code>; the extension only
+        marks the dashboard on <code>http://127.0.0.1:8357</code> or <code>http://localhost:8357</code>,
+        and only when this extension is enabled in <em>this</em> browser profile.</span></div>`;
+      return;
+    }
+    box.hidden = true; box.innerHTML = "";
+    return;
+  }
+  const b = (DATA.boards || []).find((x) => x.id === ASK.board);
+  const s = (b && b.session) || {};
+  box.hidden = false;
+  box.innerHTML = `
+    <div>
+      <b>${esc(ASK.name || ASK.board)}</b> isn't connected yet — sign in there once and the agent applies this job for you.
+      ${s.pending ? `<span class="ask-note">checking whether you're signed in…</span>` : ""}
+      ${!s.pending && s.ok === false ? `<span class="ask-note">not signed in on the site yet.</span>` : ""}
+    </div>
+    <button class="btn small ok" data-ask-connect="${esc(ASK.board)}" ${s.pending ? "disabled" : ""}>
+      ${s.pending ? "Verifying…" : "Connect " + esc(ASK.name || ASK.board)}
+    </button>`;
+}
+
+/* Open the job page without stealing the user's tab: the extension's relay on
+ * this page hands the URL to the service worker (chrome.tabs.create active:false).
+ * Without the extension there is nothing that could fill the form, so the tab
+ * is opened visibly instead. */
+function openBehind(url) {
+  /* data-job-agent-ext is set by the extension's dashboard-relay.js — a DOM
+   * attribute because content scripts cannot see the page's window globals. */
+  if (document.documentElement.hasAttribute("data-job-agent-ext")) {
+    try {
+      window.postMessage({ source: "job-agent-dashboard", type: "apply:open", url }, location.origin);
+      return;
+    } catch { /* fall through to a normal tab */ }
+  }
+  window.open(url, "_blank", "noopener");
+}
+
+/* ---------- extension presence watcher ----------
+ * dashboard-relay.js marks the document (data-job-agent-ext) from its own
+ * isolated world. Content scripts run on Chrome's schedule, not this page's,
+ * so the mark can land AFTER boot() has already painted the "isn't loaded"
+ * banner — and pollFreshness only re-renders when the server data changes, so
+ * on a quiet page the stale banner never cleared, no matter what. Watch the
+ * attribute itself instead of sampling it once per data change. */
+let EXT_PRESENT = document.documentElement.hasAttribute("data-job-agent-ext");
+function syncExtPresence() {
+  const now = document.documentElement.hasAttribute("data-job-agent-ext");
+  if (now === EXT_PRESENT) return;
+  EXT_PRESENT = now;
+  renderAsk();
+}
+try {
+  new MutationObserver(syncExtPresence).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-job-agent-ext"],
+  });
+} catch { /* no observer — the attribute is read live on every render anyway */ }
+
+/* One engine turn: ask the dashboard which queued job to open next. The server
+ * decides — one job at a time, never an applied one — and answers `needLogin`
+ * when that board's session is not verified, so the board can be connected
+ * BEFORE a tab is spent on a login wall. */
+async function kickQueue() {
+  if (kickBusy) return null;
+  kickBusy = true;
+  try {
+    const res = await post("/api/apply/kick", {});
+    if (res && res.needLogin) {
+      ASK.board = res.needLogin;
+      ASK.name = res.boardName || res.needLogin;
+      ASK.open = res.open || "";
+    } else if (res && res.job && res.job.url) {
+      ASK.board = null;
+      PENDING.add(res.job.id);
+      openBehind(res.job.url);
+    }
+    DATA = await api("/api/bootstrap");
+    renderCards();
+    renderTimelineIfVisible();
+    return res;
+  } catch {
+    return null;
+  } finally {
+    kickBusy = false;
+  }
+}
+
+$("#card-search")?.addEventListener("input", renderCards);
+$("#card-minmatch")?.addEventListener("change", renderCards);
+
+/* Apply → the whole application happens behind the scenes. The click only
+ * queues the job (decision "apply") and asks the engine for a turn; from there
+ * the extension connects the board, fills and submits, and reports back — the
+ * card then vanishes because the server stops serving applied jobs. */
 document.addEventListener("click", async (e) => {
-  const btn = e.target.closest("[data-connect]");
+  const btn = e.target.closest("[data-apply-job]");
   if (!btn) return;
-  const id = btn.dataset.connect;
-  const b = DATA.boards.find((x) => x.id === id);
-  const pend = !!(b.session && b.session.pending);
-  /* Connect is a CLAIM until the extension verifies it on the board tab —
-   * the server holds it in `pending`. A second click while pending is the
-   * user's explicit "skip verification" (still opens the tab: jobs are
-   * fetched from there either way). Disconnect is immediate. */
-  const body = b.connected
-    ? { connected: false }
-    : { connected: true, ...(pend ? { force: true } : {}) };
-  const res = await post(`/api/boards/${id}/connect`, body);
-  DATA.boards = res.boards || DATA.boards;
-  DATA.log = res.log;
-  // re-fetch to keep state canonical
-  DATA = await api("/api/bootstrap");
-  renderBoards();
-  renderJobs();
-  renderTimelineIfVisible();
-  /* The board tab is where login is verified AND jobs are fetched. */
-  if (!b.connected && b.searchUrl) window.open(b.searchUrl, "_blank", "noopener");
+  const id = Number(btn.dataset.applyJob);
+  const job = (DATA.jobs || []).find((x) => x.id === id);
+  if (!job) return;
+  PENDING.add(id);
+  btn.disabled = true;
+  btn.textContent = "applying…";
+  await post(`/api/jobs/${id}/action`, { action: "apply" });
+  const res = await kickQueue();
+  /* Queued but another job is still being submitted — it will be opened as
+   * soon as that page reports; nothing else to do here. */
+  if (res && res.waiting) PENDING.delete(id);
+  renderCards();
 });
 
-/* "Fetch all jobs" starts a page-walking sweep on the dashboard and opens the
- * board so the extension can run it: every result page is harvested until the
- * cap. The server dedupes, so re-fetching never duplicates a job. */
+/* Connect → the board tab is opened so the extension can verify the session
+ * (and, on a signed-out site, so the user can log in). Once it verifies, the
+ * poll below kicks the queue again and the job the user pressed Apply on is
+ * submitted without another click. */
 document.addEventListener("click", async (e) => {
-  const btn = e.target.closest("[data-fetch]");
+  const btn = e.target.closest("[data-ask-connect]");
   if (!btn) return;
-  const b = DATA.boards.find((x) => x.id === btn.dataset.fetch);
-  if (!b) return;
-  await post(`/api/boards/${b.id}/sweep`, { pages: 5 });
-  window.open(b.searchUrl || b.loginUrl, "_blank", "noopener");
+  const id = btn.dataset.askConnect;
+  const b = (DATA.boards || []).find((x) => x.id === id);
+  const pend = !!(b && b.session && b.session.pending);
+  btn.disabled = true;
+  btn.textContent = "Opening…";
+  await post(`/api/boards/${id}/connect`, { connected: true, ...(pend ? { force: true } : {}) });
   DATA = await api("/api/bootstrap");
-  renderBoards();
+  renderCards();
+  if (b) window.open(b.searchUrl || b.loginUrl, "_blank", "noopener");
 });
 
 /* ---------- step 3: match % ---------- */
@@ -223,9 +350,7 @@ function renderJobs() {
   $("#job-list").innerHTML = top.length
     ? top.map(jobRow).join("")
     : DATA.jobs.length === 0
-      ? DATA.boards.some((b) => b.connected)
-        ? `<div class="empty">Connected, but no jobs fetched yet — hit <b>Fetch fresh jobs ↗</b> in step 2 (opens the board in your logged-in tab; the extension reads its listings and they appear here automatically).</div>`
-        : `<div class="empty">No boards connected yet — connect a board in step 2 and its matched jobs show up here.</div>`
+      ? `<div class="empty">Nothing left to apply to — every matched job has been applied to (applied jobs are removed). New listings from your boards land here as you browse them.</div>`
       : `<div class="empty">No jobs match that filter. Loosen the % threshold or clear the search.</div>`;
   updateStats();
 }
@@ -323,10 +448,12 @@ $("#panel-apply")?.addEventListener("click", async (e) => {
 
 /* ---------- step 5: apply log / digest ---------- */
 function renderTimeline() {
-  const applied = DATA.jobs.filter((j) => ["apply", "applied"].includes(DATA.decisions[j.id]?.action));
-  const approved = Object.values(DATA.decisions).filter((d) => d.action === "approve").length;
-
-  const confirmed = DATA.jobs.filter((j) => DATA.decisions[j.id]?.action === "applied");
+  /* An APPLIED job leaves `jobs` the moment its verdict lands — the server
+   * stops serving it. Its confirmation lives in appliedJobs (the server's
+   * compact list of confirmed submissions), so the digest reads confirmations
+   * from there. Reading them from the card list would always yield zero. */
+  const confirmed = DATA.appliedJobs || [];
+  const queued = DATA.jobs.filter((j) => DATA.decisions[j.id]?.action === "apply");
   const run = DATA.run;
   const left = run && run.total ? run.total - run.attempted : 0;
   const runLine = run && run.total
@@ -335,9 +462,9 @@ function renderTimeline() {
         : `Applying <b>${run.attempted}/${run.total}</b> · <b>${run.applied}</b> applied${run.halted ? ` · <b>${run.halted}</b> halted` : ""} — keep the browser open.`
           + (left > 0 ? ` <button class="btn small" id="btn-resume-run" title="Opens the next queued job; from there the page reports back and the chain advances itself">Resume — open queued job ${run.attempted + 1} of ${run.total}</button>` : "")}</div>`
     : "";
-  $("#digest-body").innerHTML = runLine + (applied.length || confirmed.length
-    ? `Good morning 👋 <b>${confirmed.length}</b> application${confirmed.length === 1 ? "" : "s"} submitted by the agent${confirmed.length ? " (confirmations below)" : ""}, <b>${applied.length - confirmed.length}</b> queued.<br>
-       ${confirmed.slice(0, 5).map((j) => `• ✓ ${esc(j.title)} @ ${esc(j.company)} (${j.match}%)${DATA.decisions[j.id]?.confirmation ? ` — ${esc(DATA.decisions[j.id].confirmation)}` : ""}`).join("<br>")}
+  $("#digest-body").innerHTML = runLine + (queued.length || confirmed.length
+    ? `Good morning 👋 <b>${confirmed.length}</b> application${confirmed.length === 1 ? "" : "s"} submitted by the agent${confirmed.length ? " (confirmations below)" : ""}, <b>${queued.length}</b> queued.<br>
+       ${confirmed.slice(0, 5).map((j) => `• ✓ ${esc(j.title)} @ ${esc(j.company)} (${j.match}%)${(j.confirmation || DATA.decisions[j.id]?.confirmation) ? ` — ${esc(j.confirmation || DATA.decisions[j.id].confirmation)}` : ""}`).join("<br>")}
        ${confirmed.length > 5 ? `<br>…and ${confirmed.length - 5} more` : ""}`
     : `No applications yet. Approve jobs in step 4, then hit <b>Apply to approved jobs</b> — the agent opens each approved job in turn, fills and submits it, and reports the confirmation back here.`);
 
@@ -358,7 +485,7 @@ $("#btn-restart")?.addEventListener("click", async () => {
   if (!confirm("Reset connections, approvals and the apply log?")) return;
   await fetch("/api/reset", { method: "POST" });
   DATA = await api("/api/bootstrap");
-  renderProfile(); renderBoards(); renderJobs(); renderTimeline();
+  renderProfile(); renderCards(); renderJobs(); renderTimeline();
   goto("profile");
 });
 
@@ -398,10 +525,24 @@ async function pollFreshness() {
     if (sig === POLL_SIG) return;
     POLL_SIG = sig;
     DATA = next;
-    renderBoards();
+    renderCards();
     renderJobs();
     if ($("#panel-approve").classList.contains("active")) renderQueue();
     renderTimelineIfVisible();
+    /* A card the agent finished no longer exists in `jobs` — drop its busy
+     * marker so a retry card would render fresh if one reappears. */
+    for (const id of [...PENDING]) {
+      if (!DATA.jobs.some((j) => j.id === id)) PENDING.delete(id);
+    }
+    /* The user connected the board the agent was waiting on: hand the queued
+     * job straight out — no second Apply click. */
+    if (ASK.board) {
+      const b = (DATA.boards || []).find((x) => x.id === ASK.board);
+      if (b && b.connected) {
+        ASK.board = null;
+        await kickQueue();
+      }
+    }
   } catch { /* dashboard restarting — next tick retries */ }
 }
 setInterval(pollFreshness, 10000);
@@ -471,7 +612,7 @@ async function queueWatchdog() {
       lastAutoKick = now;
       window.open(dead.searchUrl || dead.loginUrl, "_blank", "noopener");
       DATA = await api("/api/bootstrap");
-      renderBoards();
+      renderCards();
       renderTimelineIfVisible();
     } catch { /* dashboard restarting — next tick retries */ }
     finally { kickInFlight = false; }
@@ -484,7 +625,7 @@ setInterval(queueWatchdog, 10000);
   DATA = await api("/api/bootstrap");
   POLL_SIG = dataSig(DATA);
   renderProfile();
-  renderBoards();
+  renderCards();
   renderJobs();
   renderTimeline();
 })();

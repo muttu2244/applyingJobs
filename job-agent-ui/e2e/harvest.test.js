@@ -10,7 +10,8 @@
  *   2. a listing whose URL belongs to a DIFFERENT board is refused (no
  *      smuggling linkedin.com links in under the "naukri" tag);
  *   3. accepted listings are scored with match %, flagged fresh, counted on
- *      the board card, and gated by connection exactly like the base index;
+ *      the board card, and served next to the base index (visibility is NOT
+ *      gated on connection — Apply establishes the session);
  *   4. re-fetches (including the same URL with tracking params) dedupe;
  *   5. the base index dedupes against harvests, and a fresh job's id works
  *      for approve/report like any other.
@@ -101,15 +102,24 @@ const harvest = (board, jobs) => req("POST", "/api/harvest", { board, jobs });
     check("store entries are source=live with scores", h.entries.every((e) => e.source === "live" && e.score > 0 && e.hits.length), h.entries);
     check("fetchedAt stamped on the board", Number.isFinite(h.fetchedAt.naukri), h.fetchedAt);
 
-    /* --- 3. bootstrap: selected board only, fresh + counted --- */
+    /* --- 3. bootstrap: the fetch lands as 2 fresh, scored jobs ---
+     * Job visibility is NOT gated on connection any more (the dashboard shows
+     * every matched job and connects the board on Apply), so these assertions
+     * look at the fresh entries rather than the whole list. */
     let b = (await req("GET", "/api/bootstrap")).body;
-    check("jobs served = the 2 fresh naukri jobs", b.jobs.length === 2, b.jobs.length);
-    check("every job is board=naukri (no LinkedIn leakage)", b.jobs.every((j) => j.board === "naukri"), b.jobs.map((j) => j.board));
-    check("jobs flagged fresh with fetchedAt", b.jobs.every((j) => j.fresh === true && j.fetchedAt), b.jobs[0]);
-    check("jobs carry a match %", b.jobs.every((j) => j.match > 0), b.jobs.map((j) => j.match));
+    const freshNow = () => b.jobs.filter((j) => j.fresh);
+    check("jobs served = the 2 fresh naukri jobs", freshNow().length === 2, freshNow().length);
+    check("every fresh job is board=naukri (no LinkedIn leakage)", freshNow().every((j) => j.board === "naukri"), freshNow().map((j) => j.board));
+    check("jobs flagged fresh with fetchedAt", freshNow().every((j) => j.fetchedAt), freshNow()[0]);
+    check("jobs carry a match %", b.jobs.filter((j) => j.board === "naukri").every((j) => j.match > 0), freshNow().map((j) => j.match));
     const nb = b.boards.find((x) => x.id === "naukri");
     check("naukri card counts 2 + shows last fetch", nb.jobs === 2 && nb.fetchedAt, nb);
-    check("linkedin card counts 0", b.boards.find((x) => x.id === "linkedin").jobs === 0);
+    /* Board counts are per-board job totals, not a connection gate: what the
+     * naukri fetch must NOT do is leave a fetch time on a board it never
+     * touched. */
+    check("linkedin has no fetch time (it was never fetched)",
+      !b.boards.find((x) => x.id === "linkedin").fetchedAt,
+      b.boards.find((x) => x.id === "linkedin").fetchedAt);
 
     /* --- 4. re-fetch dedupes, reports honestly --- */
     r = await harvest("naukri", [
@@ -118,7 +128,7 @@ const harvest = (board, jobs) => req("POST", "/api/harvest", { board, jobs });
     ]);
     check("re-fetch adds only the genuinely new job", r.body.added === 1 && r.body.skipped === 1, r.body);
     b = (await req("GET", "/api/bootstrap")).body;
-    check("bootstrap now serves 3 unique jobs", b.jobs.length === 3, b.jobs.length);
+    check("bootstrap now serves 3 unique fresh jobs", b.jobs.filter((j) => j.fresh).length === 3, b.jobs.filter((j) => j.fresh).length);
 
     /* --- 5. the unselected-board case the user actually hit --- */
     r = await harvest("linkedin", [
@@ -126,7 +136,9 @@ const harvest = (board, jobs) => req("POST", "/api/harvest", { board, jobs });
     ]);
     check("linkedin fetch while unselected -> 403", r.status === 403, r.status);
     b = (await req("GET", "/api/bootstrap")).body;
-    check("still zero LinkedIn jobs on the dashboard", b.jobs.every((j) => j.board !== "linkedin"), b.jobs.map((j) => j.board));
+    check("still zero fresh LinkedIn jobs (the fetch was refused)",
+      b.jobs.filter((j) => j.fresh).every((j) => j.board !== "linkedin"),
+      b.jobs.filter((j) => j.fresh).map((j) => j.board));
 
     /* --- 6. base index dedupes against harvests; report works on fresh ids --- */
     await req("POST", "/api/boards/linkedin/connect", { connected: true });
@@ -143,11 +155,22 @@ const harvest = (board, jobs) => req("POST", "/api/harvest", { board, jobs });
     check("report on a fresh job id -> 200", rep.status === 200, rep);
     check("decision recorded against the fresh id", rep.body.decisions[freshJob.id]?.status === "applied", rep.body.decisions[freshJob.id]);
 
-    /* --- 7. disconnect hides everything again --- */
+    /* --- 7. disconnecting stops the FETCH, never the job list ---
+     * Connection is now an apply-time concern: the cards stay, and pressing
+     * Apply asks for the sign-in. What disconnecting must still do is refuse
+     * the harvest (asserted in step 1 above). */
+    /* Re-read first: the report in step 6 legitimately drops that job from the
+     * list, so a snapshot taken before it would blame disconnecting for a
+     * change the report made. */
+    b = (await req("GET", "/api/bootstrap")).body;
+    const before = b.jobs.map((j) => j.id);
     for (const id of allIds) await req("POST", `/api/boards/${id}/connect`, { connected: false });
     b = (await req("GET", "/api/bootstrap")).body;
-    check("all boards disconnected -> zero jobs", b.jobs.length === 0, b.jobs.length);
-    check("all card counts read 0", b.boards.every((x) => x.jobs === 0), b.boards.map((x) => `${x.id}:${x.jobs}`));
+    check("disconnecting changes no job card",
+      JSON.stringify(b.jobs.map((j) => j.id)) === JSON.stringify(before), { before: before.length, after: b.jobs.length });
+    check("harvest is refused again", (await harvest("naukri", [
+      { title: "After disconnect", company: "X", location: "Pune", url: "https://www.naukri.com/after-disconnect-123123" },
+    ])).status === 403);
   } finally {
     fs.writeFileSync(STATE, stateSnap);
     fs.writeFileSync(RANKED, rankedSnap);

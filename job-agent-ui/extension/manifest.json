@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "My Job Agent — Apply Agent",
-  "version": "2.12.4",
+  "version": "2.13.1",
   "description": "Fills your saved application data into Workday, Greenhouse, Lever, Ashby, LinkedIn, Indeed, Glassdoor, Wellfound, Internshala, Unstop, Cutshort, TopHire, LeetCode, GeeksforGeeks, AmbitionBox, HackerEarth and the Indian boards, advances multi-step forms, and submits — only on jobs you approved in your dashboard or when you press Fill & submit. Never pays, never fights CAPTCHAs, never guesses.",
   "permissions": [
     "activeTab",
@@ -44,6 +44,16 @@
     "default_popup": "popup.html"
   },
   "content_scripts": [
+    {
+      "matches": [
+        "http://127.0.0.1:8357/*",
+        "http://localhost:8357/*"
+      ],
+      "js": [
+        "dashboard-relay.js"
+      ],
+      "run_at": "document_start"
+    },
     {
       "matches": [
         "https://*.myworkdayjobs.com/*",

@@ -124,30 +124,49 @@ code { background: #0d1424; padding: 1px 5px; border-radius: 5px; color: var(--a
 .ok-pill { color: var(--ok); font-size: 12.5px; font-weight: 600; }
 .hint { color: var(--muted); font-size: 12.5px; margin: 12px 0 0; }
 
-/* ---------- boards ---------- */
-.board-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
-.board {
+/* ---------- job cards (step 2) ----------
+ * No board cards: the boards are machinery. One card per real job, each with
+ * the five things the user asked for — title, description, location,
+ * experience, board — plus a single Apply button. */
+.job-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; }
+.jcard {
   background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 18px; display: flex; flex-direction: column; gap: 10px; transition: .15s;
+  padding: 17px 18px; display: flex; flex-direction: column; gap: 11px; transition: .15s;
 }
-.board.connected { border-color: rgba(52,211,153,.45); box-shadow: 0 0 0 1px rgba(52,211,153,.12); }
-.board-top { display: flex; align-items: center; gap: 11px; }
-.board-logo {
-  width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center;
-  font-weight: 800; font-size: 14px; color: #071022;
+.jcard:hover { border-color: #34507f; }
+.jcard.busy { border-color: rgba(79,140,255,.5); box-shadow: 0 0 0 1px rgba(79,140,255,.14); }
+.jcard-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.jcard-head { min-width: 0; }
+.jcard-title { font-weight: 700; font-size: 15px; line-height: 1.3; }
+.jcard-sub { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+.jboard {
+  flex: 0 0 auto; font-size: 10.5px; font-weight: 700; letter-spacing: .3px;
+  padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+  color: var(--bc); border: 1px solid color-mix(in srgb, var(--bc) 55%, transparent);
+  background: color-mix(in srgb, var(--bc) 14%, transparent);
 }
-.board-name { font-weight: 700; font-size: 15px; }
-.badge { font-size: 10.5px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
-.badge.session { border-color: rgba(251,191,36,.4); color: var(--warn); }
-.badge.auto { border-color: rgba(52,211,153,.4); color: var(--ok); }
-.board p { margin: 0; font-size: 12.5px; color: var(--muted); min-height: 54px; }
-.board-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-/* Labels must stay on one line: a wrapped "Fetch / all / jobs" button reads
- * like a column and squeezes the row on narrow cards. */
-.board-actions .btn { white-space: nowrap; flex: 0 0 auto; }
-.conn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--bad); }
-.connected .conn-dot { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
-.conn-label { font-size: 12px; color: var(--muted); }
+.jcard-desc {
+  margin: 0; font-size: 12.5px; color: #aebbd4; line-height: 1.55;
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+}
+.jcard-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; }
+.jcard-meter { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.jcard-meter .bar { width: 84px; height: 5px; background: #0d1424; border-radius: 4px; overflow: hidden; }
+.jcard-meter .bar i { display: block; height: 100%; border-radius: 4px; }
+.jcard-busy { font-size: 12.5px; color: var(--accent); font-weight: 600; }
+
+/* the one moment a board is named: its sign-in is missing */
+.ask {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  flex-wrap: wrap; margin-bottom: 16px; padding: 13px 16px;
+  border: 1px solid rgba(251,191,36,.4); border-radius: var(--radius);
+  background: rgba(251,191,36,.08); color: #f3ddb0; font-size: 13px;
+}
+/* An author `display` always beats the UA's `[hidden] { display: none }`, so
+ * without this the box merely EMPTIES when there is nothing to ask — leaving an
+ * amber bar across the page. It must be able to disappear entirely. */
+.ask[hidden] { display: none; }
+.ask-note { display: block; color: var(--muted); font-size: 12px; margin-top: 3px; }
 
 /* ---------- jobs ---------- */
 .match-controls { display: flex; gap: 10px; }

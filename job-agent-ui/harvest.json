@@ -2418,9 +2418,525 @@
    "hits": [],
    "source": "live",
    "fetchedAt": 1792597439338
+  },
+  {
+   "job_title": "Ai ML Engineer",
+   "company_name": "Andor Tech",
+   "company_location": "Bengaluru",
+   "job_listed": "1 day ago",
+   "experience": "8-19 Yrs",
+   "salary": "50,000-18 Lacs PA",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-ai-ml-engineer-andor-tech-bengaluru-8-to-19-years-221026023675",
+   "score": 12,
+   "hits": [
+    "ml engineer"
+   ],
+   "source": "live",
+   "fetchedAt": 1792827636242
+  },
+  {
+   "job_title": "Gen AI Architect",
+   "company_name": "Tata Consultancy Services3.2125193 reviews",
+   "company_location": "India",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-gen-ai-architect-tata-consultancy-services-india-10-to-19-years-151026033268",
+   "score": 23,
+   "hits": [
+    "gen ai",
+    "ai architect"
+   ],
+   "source": "live",
+   "fetchedAt": 1792827662297
+  },
+  {
+   "job_title": "SR AI/ML Engineer",
+   "company_name": "Mazosolutions4.15 reviews",
+   "company_location": "Hybrid - Bengaluru, Chennai",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-sr-ai-ml-engineer-mazosolutions-chennai-bengaluru-6-to-11-years-011026022873",
+   "score": 20,
+   "hits": [
+    "ml engineer",
+    "ai/ml"
+   ],
+   "source": "live",
+   "fetchedAt": 1792827662297
+  },
+  {
+   "job_title": "Lead AI Engineer",
+   "company_name": "Impressico Business Solutions4.5243 reviews",
+   "company_location": "Noida, Hyderabad",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-lead-ai-engineer-impressico-business-solutions-pvt-ltd-noida-hyderabad-8-to-12-years-211026905581",
+   "score": 12,
+   "hits": [
+    "ai engineer"
+   ],
+   "source": "live",
+   "fetchedAt": 1792827662297
+  },
+  {
+   "job_title": "Lead AI/ML Engineer",
+   "company_name": "Armakuni4.761 reviews",
+   "company_location": "Ahmedabad",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-lead-ai-ml-engineer-armakuni-ahmedabad-5-to-10-years-131026013318",
+   "score": 19,
+   "hits": [
+    "ml engineer",
+    "ai/ml"
+   ],
+   "source": "live",
+   "fetchedAt": 1792827662297
+  },
+  {
+   "job_title": "AI Integration & Enterprise Connector Lead_XP: 6+_Bengaluru",
+   "company_name": "Tata Consultancy Services",
+   "company_location": "Bengaluru",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-ai-integration-enterprise-connector-lead-xp-6-bengaluru-tata-consultancy-services-bengaluru-6-to-10-years-161026000315",
+   "score": 7,
+   "hits": [],
+   "source": "live",
+   "fetchedAt": 1792827662297
+  },
+  {
+   "job_title": "AI Architect (Healthcare)",
+   "company_name": "Emids Technologies",
+   "company_location": "Hybrid - Bengaluru",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-ai-architect-healthcare-emids-technologies-bengaluru-12-to-19-years-171026012424",
+   "score": 19,
+   "hits": [
+    "ai architect"
+   ],
+   "source": "live",
+   "fetchedAt": 1792827662297
+  },
+  {
+   "job_title": "Architect - GEN AI (AWS / Azure)",
+   "company_name": "An Indian MNC",
+   "company_location": "Bengaluru, Hyderabad, Pune",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-architect-gen-ai-aws-azure-ssj-solutions-hyderabad-pune-bengaluru-13-to-20-years-211026023876",
+   "score": 26,
+   "hits": [
+    "gen ai",
+    "aws",
+    "azure"
+   ],
+   "source": "live",
+   "fetchedAt": 1792827662297
+  },
+  {
+   "job_title": "Senior Manager AI/ML Engineering - AI/ML/Generative AI",
+   "company_name": "Optum",
+   "company_location": "Bengaluru, Bengaluru",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-senior-manager-ai-ml-engineering-ai-ml-generative-ai-optum-global-solutions-india-private-limited-bengaluru-bengaluru-14-to-19-years-191026910918",
+   "score": 33,
+   "hits": [
+    "ml engineer",
+    "ai/ml",
+    "generative ai"
+   ],
+   "source": "live",
+   "fetchedAt": 1792827662297
+  },
+  {
+   "job_title": "Staff AI Engineer",
+   "company_name": "Nokia",
+   "company_location": "Bengaluru",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-staff-ai-engineer-nokia-solutions-and-networks-india-p-ltd-bengaluru-11-to-12-years-191026918304",
+   "score": 16,
+   "hits": [
+    "ai engineer"
+   ],
+   "source": "live",
+   "fetchedAt": 1792827662297
+  },
+  {
+   "job_title": "Reactivate Premium",
+   "company_name": "Job search faster with Premium",
+   "company_location": "",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.linkedin.com/premium/products/?upsellOrderOrigin=Tracking%3Av1%3Ajdp_aiq_company_insights_static%3AJob+Seeker%3AIn-Product&utype=job&referenceId=e6g68C%2B2STOCkX9EXSgxHg%3D%3D&isSS=false&upsellSlotId=JDP_AIQ_COMPANY_INSIGHTS_STATIC",
+   "score": 0,
+   "hits": [],
+   "source": "live",
+   "fetchedAt": 1792848775746
+  },
+  {
+   "job_title": "AI/ML Engineer - Generative AI GenAI",
+   "company_name": "Jnanasethu IT Labs (OPC) Private Limited",
+   "company_location": "Bengaluru",
+   "job_listed": "1 day ago",
+   "experience": "6-10 Yrs",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-ai-ml-engineer-generative-ai-genai-jnanasethu-it-labs-opc-private-limited-bengaluru-6-to-10-years-241026004660",
+   "score": 34,
+   "hits": [
+    "ml engineer",
+    "ai/ml",
+    "genai",
+    "generative ai"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922214489
+  },
+  {
+   "job_title": "Applied AI Engineer, Security",
+   "company_name": "SP Software",
+   "company_location": "Bengaluru",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-applied-ai-engineer-security-sp-software-bengaluru-12-to-20-years-231026029213",
+   "score": 12,
+   "hits": [
+    "ai engineer"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922227066
+  },
+  {
+   "job_title": "Principal AI/ML & Data Science Architect",
+   "company_name": "Company that designs, bui...",
+   "company_location": "Bengaluru",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-principal-ai-ml-data-science-architect-wissda-consulting-bengaluru-10-to-20-years-231026014988",
+   "score": 21,
+   "hits": [
+    "ai/ml"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922227066
+  },
+  {
+   "job_title": "AI/ML Engineer_Generative AI, Agentic Systems & MLOps_XP:6+_ Bengaluru",
+   "company_name": "Tata Consultancy Services3.2125249 reviews",
+   "company_location": "Bengaluru",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-ai-ml-engineer-generative-ai-agentic-systems-mlops-xp-6-bengaluru-tata-consultancy-services-bengaluru-6-to-11-years-300926036861",
+   "score": 44,
+   "hits": [
+    "mlops",
+    "ml engineer",
+    "ai/ml",
+    "generative ai",
+    "agentic"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922290078
+  },
+  {
+   "job_title": "AI Engineer",
+   "company_name": "Pi Square Technologies3.696 reviews",
+   "company_location": "Hybrid - Bengaluru",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-ai-engineer-pi-square-technologies-bengaluru-5-to-7-years-300926028074",
+   "score": 12,
+   "hits": [
+    "ai engineer"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922290078
+  },
+  {
+   "job_title": "Generative AI Engineer",
+   "company_name": "Infosys3.553648 reviews",
+   "company_location": "Bengaluru, Mangaluru, Mysuru",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-generative-ai-engineer-infosys-mangaluru-mysuru-bengaluru-6-to-10-years-170626037511",
+   "score": 19,
+   "hits": [
+    "ai engineer",
+    "generative ai"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922290078
+  },
+  {
+   "job_title": "Data Scientist with MNC IT",
+   "company_name": "Wize Careers Consultants",
+   "company_location": "Bengaluru, Hyderabad, Pune",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-data-scientist-with-mnc-it-wize-careers-consultants-hyderabad-pune-bengaluru-6-to-11-years-241026003911",
+   "score": 7,
+   "hits": [
+    "data scientist"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922290078
+  },
+  {
+   "job_title": "Artificial Intelligence Engineer",
+   "company_name": "Saisystems Technology",
+   "company_location": "",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-artificial-intelligence-engineer-saisystems-technology-pune-chennai-mumbai-all-areas-4-to-8-years-231026014323",
+   "score": 0,
+   "hits": [],
+   "source": "live",
+   "fetchedAt": 1792922290078
+  },
+  {
+   "job_title": "Senior AI/ML Engineer ( Gean AI & Agentic AI )",
+   "company_name": "Ciklum",
+   "company_location": "Hybrid - Bengaluru, Pune, Chennai",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-senior-ai-ml-engineer-gean-ai-agentic-ai-ciklum-pune-chennai-bengaluru-6-to-11-years-221026032532",
+   "score": 30,
+   "hits": [
+    "ml engineer",
+    "ai/ml",
+    "agentic"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922290078
+  },
+  {
+   "job_title": "Agentic AI - New Harness- Senior Consultant",
+   "company_name": "Deloitte Shared Services ...",
+   "company_location": "Bengaluru, Pune, Mumbai (All Areas)",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-agentic-ai-new-harness-senior-consultant-deloitte-shared-services-india-pune-bengaluru-mumbai-all-areas-5-to-10-years-231026017159",
+   "score": 14,
+   "hits": [
+    "agentic"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922290078
+  },
+  {
+   "job_title": "AI Engineer",
+   "company_name": "Quess IT Solutions",
+   "company_location": "Hybrid - Bengaluru, Bangalore Rural",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-ai-engineer-quess-it-solutions-bangalore-rural-bengaluru-5-to-9-years-131026049078",
+   "score": 12,
+   "hits": [
+    "ai engineer"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922290078
+  },
+  {
+   "job_title": "Senior AI/ML Engineer",
+   "company_name": "Hiringhood4.822 reviews",
+   "company_location": "Chennai, Coimbatore",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-senior-ai-ml-engineer-hiringhood-chennai-coimbatore-4-to-8-years-250926003098",
+   "score": 20,
+   "hits": [
+    "ml engineer",
+    "ai/ml"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922402083
+  },
+  {
+   "job_title": "AI / ML Engineer",
+   "company_name": "Accenture3.781392 reviews",
+   "company_location": "Pune",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-ai-ml-engineer-accenture-solutions-pvt-ltd-pune-5-to-10-years-290926936777",
+   "score": 9,
+   "hits": [
+    "ml engineer"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922402083
+  },
+  {
+   "job_title": "Junior AI/ML Engineer",
+   "company_name": "Kardee",
+   "company_location": "Chennai(Ambattur Industrial Estate)",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-junior-ai-ml-engineer-kardee-chennai-3-to-6-years-050326012135",
+   "score": 14,
+   "hits": [
+    "ml engineer",
+    "ai/ml"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922402083
+  },
+  {
+   "job_title": "GEN AI Engineer",
+   "company_name": "Infosys3.553648 reviews",
+   "company_location": "Bengaluru",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-gen-ai-engineer-infosys-limited-bengaluru-5-to-9-years-051026931745",
+   "score": 19,
+   "hits": [
+    "ai engineer",
+    "gen ai"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922402083
+  },
+  {
+   "job_title": "Principal AI Engineer",
+   "company_name": "Amoli Talents",
+   "company_location": "Hybrid - Bengaluru",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-principal-ai-engineer-amoli-talents-bengaluru-13-to-16-years-061026014504",
+   "score": 16,
+   "hits": [
+    "ai engineer"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922402083
+  },
+  {
+   "job_title": "Context AI Engineer",
+   "company_name": "CIRCANA",
+   "company_location": "Hybrid - Bengaluru",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-context-ai-engineer-circana-bengaluru-8-to-13-years-080926012832",
+   "score": 12,
+   "hits": [
+    "ai engineer"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922402083
+  },
+  {
+   "job_title": "Python Backend Engineer",
+   "company_name": "Black and white Business ...",
+   "company_location": "Bengaluru, Pune, Chennai",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-python-backend-engineer-black-and-white-business-solutions-pune-chennai-bengaluru-12-to-22-years-101026009779",
+   "score": 9,
+   "hits": [
+    "python"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922402083
+  },
+  {
+   "job_title": "Principal Engineer - AI / ML ( Speech, Voice & GenAI Architecture )",
+   "company_name": "Stryker",
+   "company_location": "Bengaluru",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-principal-engineer-ai-ml-speech-voice-genai-architecture-stryker-global-technology-center-pvt-ltd-bengaluru-12-to-17-years-191026914143",
+   "score": 30,
+   "hits": [
+    "genai",
+    "ai architect"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922402083
+  },
+  {
+   "job_title": "Data Scientist | Python | GenAI | LLM | RAG",
+   "company_name": "Infosys",
+   "company_location": "Hybrid - Bengaluru, Hyderabad, Chennai",
+   "job_listed": "",
+   "experience": "",
+   "salary": "",
+   "job_desc": "",
+   "job_detail_url": "https://www.naukri.com/job-listings-data-scientist-python-genai-llm-rag-infosys-hyderabad-chennai-bengaluru-8-to-13-years-051026042782",
+   "score": 33,
+   "hits": [
+    "llm",
+    "genai",
+    "rag",
+    "python",
+    "data scientist"
+   ],
+   "source": "live",
+   "fetchedAt": 1792922402083
   }
  ],
  "fetchedAt": {
-  "naukri": 1792599565616
+  "naukri": 1792922402083,
+  "linkedin": 1792928247635
  }
 }

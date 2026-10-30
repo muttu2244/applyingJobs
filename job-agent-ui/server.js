@@ -866,7 +866,12 @@ const server = http.createServer(async (req, res) => {
     const byId = new Map(jobs.map((j) => [j.id, j]));
     run.results = run.results || {};
     const attempted = Array.isArray(run.attempted) ? run.attempted : [];
-    const nextId = (run.queue || []).find((id) => !attempted.includes(id) && byId.has(id));
+    /* An applied job is never handed out again — even if it is still sitting
+     * in the queue (queued, then reported applied before a handout). The card
+     * list already hides it; the queue must agree, or a retry would submit a
+     * second application to the same job. */
+    const nextId = (run.queue || []).find((id) => !attempted.includes(id) && byId.has(id) &&
+      !(state.decisions[id] && state.decisions[id].action === "applied"));
     if (nextId == null) {
       const inFlight = attempted.filter((id) => !run.results[id]);
       if (inFlight.length) {
@@ -934,7 +939,8 @@ const server = http.createServer(async (req, res) => {
     if (inFlight.length) {
       return send(res, 200, { ok: true, waiting: true, run: runSummary(state.run) });
     }
-    const nextId = (state.run.queue || []).find((id) => !attempted.includes(id) && byId.has(id));
+    const nextId = (state.run.queue || []).find((id) => !attempted.includes(id) && byId.has(id) &&
+      !(state.decisions[id] && state.decisions[id].action === "applied"));
     if (nextId == null) return send(res, 200, { ok: true, nothing: true, run: runSummary(state.run) });
     return handOutNext(state, res, { checkSession: true });
   }

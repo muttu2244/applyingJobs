@@ -91,8 +91,9 @@ const page = (n) => [
     await req("POST", "/api/harvest", { board: "naukri", jobs: page(3), sweep: { page: 3, last: true } });
     s = (await req("GET", "/api/boards/naukri/sweep")).body.sweep;
     check("last page marks the sweep done", s.status === "done" && s.page === 3, s);
-    check("all six jobs stored", (await req("GET", "/api/bootstrap")).body.jobs.length === 6,
-      (await req("GET", "/api/bootstrap")).body.jobs.length);
+    check("all six jobs stored",
+      (await req("GET", "/api/bootstrap")).body.jobs.filter((j) => j.board === "naukri").length === 6,
+      (await req("GET", "/api/bootstrap")).body.jobs.filter((j) => j.board === "naukri").length);
     check("finish logged", /fetch-all finished/.test((await req("GET", "/api/bootstrap")).body.log[0].text),
       (await req("GET", "/api/bootstrap")).body.log[0]);
 

@@ -4,10 +4,17 @@
       "id": "linkedin",
       "name": "LinkedIn",
       "kind": "session-gated",
-      "connected": false,
+      "connected": true,
       "note": "Session-gated — no apply API. The extension applies through your logged-in browser session: approve a job here and its autopilot fills and submits the application for you.",
       "jobs": 210,
-      "loginUrl": "https://www.linkedin.com/login"
+      "loginUrl": "https://www.linkedin.com/login",
+      "session": {
+        "ok": true,
+        "at": 1792928242244,
+        "pending": false,
+        "pendingAt": null,
+        "detail": "{\"in\":true,\"out\":false,\"form\":false}"
+      }
     },
     {
       "id": "indeed",
@@ -145,6 +152,122 @@
       "loginUrl": "https://www.hackerearth.com/login/"
     }
   ],
-  "decisions": {},
-  "log": []
+  "decisions": {
+    "2": {
+      "action": "apply",
+      "ts": 1792928249935,
+      "status": "failed",
+      "detail": "No submit control on www.linkedin.com: 0 fields filled, but nothing on this page finishes the application. There is no reachable Apply/Easy Apply control here to open the form. Controls seen: \"Close jump menu\", \"Home Home, 1 new notification\", \"Me\", \"For Business\", \"More options\". Review and submit yourself.",
+      "confirmation": null
+    },
+    "4": {
+      "action": "apply",
+      "ts": 1792928293025,
+      "status": "failed",
+      "confirmation": null,
+      "detail": "No submit control on www.linkedin.com: 0 fields filled, but nothing on this page finishes the application. There is no reachable Apply/Easy Apply control here to open the form. Controls seen: \"Close jump menu\", \"Home Home, 1 new notification\", \"Me\", \"For Business\", \"More options\". Review and submit yourself."
+    }
+  },
+  "log": [
+    {
+      "ts": 1792928293025,
+      "type": "halted",
+      "text": "halted — No submit control on www.linkedin.com: 0 fields filled, but nothing on this page finishes the application. There is no reachable Apply/Easy Apply control here to open the form. Controls seen: \"Close jump menu\", \"Home Home, 1 new notification\", \"Me\", \"For Business\", \"More options\". Review and submit yourself.: Site Reliability Engineer - Python & GenAI Platforms @ Tata Consultancy Services"
+    },
+    {
+      "ts": 1792928292605,
+      "type": "halted",
+      "text": "halted — No submit control on www.linkedin.com: 0 fields filled, but nothing on this page finishes the application. There is no reachable Apply/Easy Apply control here to open the form. Controls seen: \"Close jump menu\", \"Home Home, 1 new notification\", \"Me\", \"For Business\", \"More options\". Review and submit yourself.: Site Reliability Engineer - Python & GenAI Platforms @ Tata Consultancy Services"
+    },
+    {
+      "ts": 1792928249935,
+      "type": "halted",
+      "text": "halted — No submit control on www.linkedin.com: 0 fields filled, but nothing on this page finishes the application. There is no reachable Apply/Easy Apply control here to open the form. Controls seen: \"Close jump menu\", \"Home Home, 1 new notification\", \"Me\", \"For Business\", \"More options\". Review and submit yourself.: Senior AI Engineer - GenAI, AI Platform & Voice AI @ Mavenir"
+    },
+    {
+      "ts": 1792928249782,
+      "type": "halted",
+      "text": "halted — No submit control on www.linkedin.com: 0 fields filled, but nothing on this page finishes the application. There is no reachable Apply/Easy Apply control here to open the form. Controls seen: \"Close jump menu\", \"Home Home, 1 new notification\", \"Me\", \"For Business\", \"More options\". Review and submit yourself.: Senior AI Engineer - GenAI, AI Platform & Voice AI @ Mavenir"
+    },
+    {
+      "ts": 1792928237329,
+      "type": "apply",
+      "text": "apply run finished — 0 applied, 2 halted, 2 total"
+    },
+    {
+      "ts": 1792928234715,
+      "type": "halted",
+      "text": "halted — No submit control on www.linkedin.com: 0 fields filled, but nothing on this page finishes the application. There is no reachable Apply/Easy Apply control here to open the form. Controls seen: \"Close jump menu\", \"Home Home, 1 new notification\", \"Me\", \"For Business\", \"More options\". Review and submit yourself.: Senior AI Engineer - GenAI, AI Platform & Voice AI @ Mavenir"
+    },
+    {
+      "ts": 1792928234624,
+      "type": "halted",
+      "text": "halted — No submit control on www.linkedin.com: 0 fields filled, but nothing on this page finishes the application. There is no reachable Apply/Easy Apply control here to open the form. Controls seen: \"Close jump menu\", \"Home Home, 1 new notification\", \"Me\", \"For Business\", \"More options\". Review and submit yourself.: Senior AI Engineer - GenAI, AI Platform & Voice AI @ Mavenir"
+    },
+    {
+      "ts": 1792928068070,
+      "type": "apply",
+      "text": "apply run started — 2 approved jobs queued (cap 25)"
+    },
+    {
+      "ts": 1792928040719,
+      "type": "approve",
+      "text": "approved: Senior AI Engineer - GenAI, AI Platform & Voice AI @ Mavenir"
+    },
+    {
+      "ts": 1792922920047,
+      "type": "apply",
+      "text": "apply run finished — 0 applied, 1 halted, 1 total"
+    },
+    {
+      "ts": 1792922920027,
+      "type": "halted",
+      "text": "halted — No submit control on www.linkedin.com: 0 fields filled, but nothing on this page finishes the application. There is no reachable Apply/Easy Apply control here to open the form. Controls seen: \"Close jump menu\", \"Home Home, 1 new notification\", \"Me\", \"For Business\", \"More options\". Review and submit yourself.: Site Reliability Engineer - Python & GenAI Platforms @ Tata Consultancy Services"
+    },
+    {
+      "ts": 1792922878784,
+      "type": "connect",
+      "text": "LinkedIn connected — session verified in your browser"
+    },
+    {
+      "ts": 1792922871663,
+      "type": "verify",
+      "text": "LinkedIn — verifying your session (checking the board tab just opened)"
+    },
+    {
+      "ts": 1792922867273,
+      "type": "apply",
+      "text": "queued — the agent connects & applies: Site Reliability Engineer - Python & GenAI Platforms @ Tata Consultancy Services"
+    }
+  ],
+  "run": {
+    "id": "run-1792928068070",
+    "startedAt": 1792928068070,
+    "finishedAt": 1792928237329,
+    "done": true,
+    "cap": 25,
+    "minMatch": 0,
+    "queue": [
+      2,
+      4
+    ],
+    "attempted": [
+      2,
+      4
+    ],
+    "results": {
+      "2": {
+        "status": "failed",
+        "at": 1792928234715,
+        "confirmation": null,
+        "detail": "No submit control on www.linkedin.com: 0 fields filled, but nothing on this page finishes the application. There is no reachable Apply/Easy Apply control here to open the form. Controls seen: \"Close j"
+      },
+      "4": {
+        "status": "failed",
+        "at": 1792928228279,
+        "detail": "the job tab never reported (it was closed, or the page never loaded) — press Apply again to retry"
+      }
+    }
+  },
+  "sweeps": {}
 }

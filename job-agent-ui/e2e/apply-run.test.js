@@ -76,7 +76,10 @@ const SEED = [
     check("seed: listings accepted", h.body && h.body.added === 3, h.body);
 
     const boot = (await req("GET", "/api/bootstrap")).body;
-    const jobs = boot.jobs.slice().sort((a, b) => b.match - a.match);
+    /* Only this test's board matters here: the dashboard serves every matched
+     * job from every board (connection is established on Apply), so the
+     * seeded naukri listings are filtered out of the base index's jobs. */
+    const jobs = boot.jobs.filter((j) => j.board === "naukri").sort((a, b) => b.match - a.match);
     check("seed: three jobs visible", jobs.length === 3, jobs.length);
     const [best, mid, worst] = jobs;
 

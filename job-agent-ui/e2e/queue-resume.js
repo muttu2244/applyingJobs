@@ -81,8 +81,13 @@ const SEED = [
     check("seed: listings accepted", h.body && h.body.added === 2, h.body);
 
     const boot = (await req("GET", "/api/bootstrap")).body;
-    const ids = boot.jobs.map((j) => j.id);
-    check("seed: two jobs visible", ids.length === 2, ids);
+    /* The base index always ships its own listings (it used to be 210) — this
+     * test's world is the two synthetic jobs it just harvested, so scope to
+     * their URLs: their ids are the only ones this test may approve, open or
+     * report on, and taking all 212 sent the chain down someone else's job. */
+    const seeded = new Set(SEED.map((s) => s.url));
+    const ids = boot.jobs.filter((j) => seeded.has(j.url)).map((j) => j.id);
+    check("seed: both harvested jobs visible", ids.length === 2, ids);
     for (const id of ids) await req("POST", `/api/jobs/${id}/action`, { action: "approve" });
 
     const started = await req("POST", "/api/apply/start", { cap: 25, minMatch: 0 });
@@ -118,10 +123,10 @@ const SEED = [
 
     const dash = await ctx.newPage();
     await dash.goto(BASE + "/", { waitUntil: "domcontentloaded" });
-    /* boot() renders the board grid from a non-null DATA — clicking a step
+    /* boot() renders the job cards from a non-null DATA — clicking a step
      * before that would call renderTimeline with DATA still null. */
     const bootRendered = () => dash.waitForFunction(
-      () => document.querySelectorAll("#board-grid .board").length > 0, null, { timeout: 15000 });
+      () => document.querySelectorAll("#job-cards .jcard").length > 0, null, { timeout: 15000 });
     await bootRendered();
 
     /* --- 1. the wedged run offers Resume, naming its position --- */

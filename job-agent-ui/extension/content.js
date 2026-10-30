@@ -75,7 +75,7 @@
    * isn't rendered yet, so these are never "final" clicks. Indeed sends
    * external listings to the employer's own ATS with "Apply on company site",
    * and badges its hosted ones "Easily apply" — both openers. */
-  const OPENER_HINT = /^(apply|apply now|easy apply|easily apply|apply on company site|apply with resume|apply with my resume|start( your)? application|apply for this job|begin( your)? application)$/i;
+  const OPENER_HINT = /^(apply|apply now|easy apply|easily apply|apply on (the )?(company|employer) (site|website)|apply with resume|apply with my resume|start( your)? application|apply for this job|begin( your)? application)$/i;
   const OPENER_LOOSE = /\b(apply now|easy apply|easily apply|apply with (my )?resume|apply on company site)\b/i;
   /* Anything submit- or apply-shaped is off-limits for FILLING. */
   function isSubmitLike(text, textContent) {
@@ -389,6 +389,7 @@
     return matchControls(hints, CLICKABLE)[0] || null;
   }
 
+
   /* A board's pagination "Next" is not a form Next. On a job-search page the
    * wizard used to click it, land on the next PAGE of results, and then report
    * "clicking Next did not advance the form" for a form that never existed
@@ -420,9 +421,45 @@
    * opener" on a page whose whole purpose is Apply. An href that IS the
    * application route is as strong as a button class; the hint text still has
    * to match, so random anchors never qualify. */
-  const OPENER_SELECTABLE = CLICKABLE + ", a[href*='/apply' i], a[href*='/application' i]";
+  /* `a[aria-label]` is the third opener shape seen live: LinkedIn's external
+   * apply is <a aria-label="Apply on company website">Apply</a> — no button
+   * class, no role, and an href that points at linkedin.com/safety/go/…, so
+   * neither the class nor the route gave it away. */
+  const OPENER_SELECTABLE = CLICKABLE + ", a[href*='/apply' i], a[href*='/application' i], a[aria-label]";
+  /* ATS application CHOOSERS — the step between a job page's Apply and the
+   * actual form. Workday's "Apply" lands on one, and its controls are ROUTES,
+   * not an Apply label: "Apply Manually", "Autofill with Resume", "Use My Last
+   * Application" (seen live on a salesforce.wd12.myworkdayjobs.com posting).
+   * None matched OPENER_HINT, so every Workday application dead-ended with
+   * "no reachable Apply control here to open the form" on a page whose whole
+   * purpose is to open the form. Manual / last-application rank FIRST: the
+   * resume route needs a file upload, which this extension never performs. */
+  const CHOOSER_HINTS = [
+    /^apply manually$/i,
+    /^use my last application$/i,
+    /^autofill (with|using) (my )?resume$/i,
+  ];
+  /* Each of an opener's OWN labels is tested on its own, never the joined
+   * string: that LinkedIn anchor carries text "Apply" AND aria-label "Apply on
+   * company website", and the join ("Apply Apply on company website") matches
+   * no anchored hint — the same trap that once made a plain button read
+   * "Apply Apply". */
+  function openerLabels(el) {
+    return [el.value, el.textContent, el.innerText,
+      el.getAttribute && el.getAttribute("aria-label")]
+      .filter(Boolean).map((t) => tidy(t)).filter(Boolean);
+  }
   function findOpener() {
-    return matchControls([OPENER_HINT, OPENER_LOOSE], OPENER_SELECTABLE)[0] || null;
+    const controls = visibleControls(OPENER_SELECTABLE);
+    const direct = controls.find((el) =>
+      openerLabels(el).some((t) => OPENER_HINT.test(t) || OPENER_LOOSE.test(t)));
+    if (direct) return direct;
+    /* Chooser routes, most useful first — never the resume upload. */
+    for (const hint of CHOOSER_HINTS) {
+      const el = controls.find((el) => openerLabels(el).some((t) => hint.test(t)));
+      if (el) return el;
+    }
+    return null;
   }
 
   /* Is this control the FORM's own submit button? HTML semantics, not text:
@@ -895,6 +932,31 @@
     return jobLinks >= 3 || /-jobs(\/|$|\?)|jobs-in-|\/search\b|\/jobsearch\b|\/jobs(\/|$|\?)/i.test(route);
   }
 
+  /* An ATS account wall: Workday's chooser routes end here — "Create Account"
+   * (email, password, verify password) before any application field exists.
+   * A password is a credential, which this agent never types, so the run can
+   * only stop and say so. Naming the wall is the difference between a message
+   * the user can act on ("create the account once, then Apply again") and the
+   * generic "no submit control" report that reads like a broken selector.
+   * Evidence is a VISIBLE password field PLUS an account control, so a header
+   * "Sign In" link on a real application never trips it. */
+  const ACCOUNT_CREATE = /^(create (an )?account|register|sign ?up)$/i;
+  const ACCOUNT_SIGNIN = /^(sign ?in|log ?in)$/i;
+
+  function accountWall() {
+    let passwordField = false;
+    for (const el of document.querySelectorAll("input[type=password]")) {
+      if (visible(el)) { passwordField = true; break; }
+    }
+    if (!passwordField) return null;
+    /* "Create Account" names the wall; a header "Sign In" merely points at it,
+     * and on a real Workday page it comes FIRST in the DOM. */
+    const ctl = matchControls([ACCOUNT_CREATE], CLICKABLE)[0] ||
+      matchControls([ACCOUNT_SIGNIN], CLICKABLE)[0];
+    if (!ctl) return null;
+    return { host: location.host, control: `"${clean(controlText(ctl)).slice(0, 40)}"` };
+  }
+
   async function run(opts) {
     const wantSubmit = !!(opts && opts.submit);
 
@@ -911,6 +973,17 @@
         message: "This is a job search/results page, not an application form — nothing was clicked. " +
           "Open a specific job first (the job cards in the dashboard and the popup link to it), " +
           "or use Fetch all jobs to collect the listings.",
+      };
+    }
+
+    const wall = accountWall();
+    if (wall) {
+      return {
+        ok: false, reason: "needs-account",
+        filled: [], failed: [], openQuestions: [],
+        message: `${wall.host} needs an account before it shows its application form (${wall.control}) — ` +
+          "that means setting a password, which this agent never types. Create the account or sign in " +
+          "once in this tab, then press Apply again; the site keeps you signed in from then on.",
       };
     }
 
@@ -1538,6 +1611,29 @@
     } catch { return null; }
   }
 
+  /* A submission the dashboard never records is a job that stays on the cards
+   * forever — the card only leaves the list when /report lands, and that POST
+   * can die with a restarting server, a closing tab or an asleep worker. So the
+   * verdict is written to chrome.storage.local BEFORE the send and deleted only
+   * on a server ACK; background.js re-sends whatever is left on every wake, so
+   * the card disappears even if the application — or the dashboard — restarts
+   * in between. One storage KEY per job (not one map): concurrent writes — a
+   * page reporting while the worker flushes another — touch different keys and
+   * can never clobber each other. */
+  const PENDING_REPORT_KEY = "pendingReport:";
+
+  async function queueReport(id, payload) {
+    const s = storageArea();
+    if (!s) return;
+    try { await s.set({ [PENDING_REPORT_KEY + id]: payload }); } catch {}
+  }
+
+  async function ackReport(id) {
+    const s = storageArea();
+    if (!s) return;
+    try { await s.remove(PENDING_REPORT_KEY + id); } catch {}
+  }
+
   /* Decide whether THIS page may run, based on the dashboard + marker. */
   async function resolveTarget() {
     const boot = await dashboardFetch("/api/bootstrap");
@@ -1564,17 +1660,21 @@
   }
 
   async function reportRun(job, res) {
-    await dashboardFetch(`/api/jobs/${job.id}/report`, {
+    const payload = {
+      status: res.ok && res.submitted ? "applied" : res.reason === "captcha" ? "captcha" : "failed",
+      confirmation: res.confirmation || null,
+      message: res.message || res.note || "",
+      filled: (res.filled || []).length,
+      openQuestions: res.openQuestions || [],
+    };
+    /* Durable BEFORE the send: only a server ACK clears it. */
+    await queueReport(job.id, payload);
+    const ack = await dashboardFetch(`/api/jobs/${job.id}/report`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        status: res.ok && res.submitted ? "applied" : res.reason === "captcha" ? "captcha" : "failed",
-        confirmation: res.confirmation || null,
-        message: res.message || res.note || "",
-        filled: (res.filled || []).length,
-        openQuestions: res.openQuestions || [],
-      }),
+      body: JSON.stringify(payload),
     });
+    if (ack) await ackReport(job.id);   // null = not recorded; background retries
     /* Any concluded run ends the in-flight hop — even a halted one. The
      * marker exists only to carry a run across a redirect; a run that
      * reported back concluded here, so a later page must earn a fresh
